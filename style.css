@@ -1,0 +1,18 @@
+#sketch-holder canvas {
+	border: 1px solid #000000;
+}
+
+.help {
+	font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,Arial,sans-serif;
+	color: #677481;
+	font-size: 11px;
+}
+
+.help p {
+	width: 60em;
+	padding-left: 3em;
+}
+
+.arrow {
+	text-decoration:none;
+}

@@ -1,15 +1,121 @@
+<!DOCTYPE html>
 <html>
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Dungeon Mapper</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Amatic+SC&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.js"></script>
+
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150846335-1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
+
       gtag('config', 'UA-150846335-1');
     </script>
+
+
   </head>
   <body>
-    <h1>hello world! 4</h1>
+    Boulder:
+    <a href="javascript:gui_mode=1;">big</a>
+    <a href="javascript:gui_mode=2;">medium</a>
+    <a href="javascript:gui_mode=3;">scatter</a>
+    |
+    Stairs:
+    <a class="arrow" href="javascript:gui_mode=9;">&#8679;</a>
+    <a class="arrow" href="javascript:gui_mode=7;">&#8681;</a>
+    <a class="arrow" href="javascript:gui_mode=8;">&#8678;</a>
+    <a class="arrow" href="javascript:gui_mode=10;">&#8680;</a>
+    |
+    Text:
+    <a href="javascript:gui_mode=4;">text</a>
+    |
+    Banners:
+    <a href="javascript:gui_mode=5;">b1</a>
+    <a href="javascript:gui_mode=6;">b2</a>
+
+    <hr>
+    <pre id="#ascii85"></pre>
+
+    
+
+    <div id="sketch-holder">
+      <!-- Our sketch will go here! -->
+    </div>
+
+    <div class="help">
+    Bugs and features
+    <p>
+        <a href="examples/">Examples</a> and ideas.
+    </p>
+    <p>
+    The colours are a bit random. Sure, it doesn't make for the most coherent user interface. Oh well. You'll cope.
+    </p>
+    <p>
+        No save. Right click does things. You can open multiple browser tabs to keep track of things. Or screen shots. You will lose work. Sorry.
+    </p>
+    <p>
+        No way to print or save to a PDF. Feedback and ideas needed before I code this.
+    </p>
+    Help
+    <p>
+        Squares, walls, clutter: Click and a room will appear. Keep clicking and more rooms. Click on a room and it may delete (or turn into a door see below.) Clutter and hatching is random
+    </p>
+    <p>
+        Doors: draw a room 1x3 squares. Click on the middle square - boom - a door appears.
+    </p>
+    <p>
+        Boulders: These are a bit random. Scatter - scatters a few around. Don't like what you see? Click on it to delete it and try again. Life is random. So are boulders.
+    </p>
+    <p>
+    Text: Text with no background. Useful to label things. You can experiment. e.g. use a # for treasure chest, or &gt; for a trap, or an O for a mystical pool. It's ascii art. You'll figure out some neat uses for it. I trust you.
+    </p>
+    <p>
+        Banners: I like b1 for lower case text. Its upper case letters suck. I like b2 for upper case text. Feel free to break those rules. I don't mind. Try entering a few spaces followed by a ! then use a pen to write your own label.
+    </p>
+    <p>
+        Tip 1: You have a pen. Print the dungeon and use your pen on it. Highlighers. Post-it notes.
+    </p>
+    <p>
+        Tip 2: Line of sight. Use <b>scisors</b> to cut up the dungeon. <a href="https://youtu.be/tcdXPoy-0xw?t=817">Reveal it to your players</a>. Use the labels to help organise the 'jigsaw'. Tape it together. Nothing is more enticing to a player than a locked door with a big blank space behind it. You can design a dungeon so that the players can choose to go East or West, but as a DM you reveal the room with encounter 1 and clue 1 in whichever direction they choose.
+    </p>
+    <p>
+        Tip 3: Narrow coridoors are choke points.
+    </p>
+    <p>
+        Tip 4: Prison cells. Treasure rooms. Traps. Sleeping quaters. Rec rooms. Pits. Stables. Temple. Cave in. Rotten planks. River. <a href="https://www.youtube.com/watch?v=tcdXPoy-0xw">Flavour</a>. Walk-ways. Ladders. Acid pools. NPCs. Clue. Shop. Fireplace. Upstairs? Downstairs? How deep is this place?
+    </p>
+    <p>
+        Tip 5: Tension and fear. "You hear a roar echoing through the dungeon." ... "You find a human foot. Mostly eaten." ... "Three weeks later you have finally dug through the cave in" ... "Something senses you"
+    </p>
+    <p>
+        Tip 6: The world is not static. Who is following the group? Who is running from them? What is hunting them? When they rest - what runs into them? Can the players lay in ambush? What do they see at the end of the coridoor? Hear behind a door?
+    </p>
+    <p>
+        Tip 7: Players should label the map. Encourage this. It is their game. Let them own it.
+    </p>
+    <p>
+        Tip 8: It's not a dungeon, it's a market, a crashed spaceship, a fallen tower, a sea cave, a mansion, a fort, mud huts, termite mound, guts of a giant worm, bee hive, rotten tree.
+    </p>
+    <p>
+        Tip 9: Snipping tool. Win + SHIT + s. <a href="https://www.getpaint.net/">paint.net</a>
+    </p>
+    </div>
+
+    <!---- script src="ascii85/ascii85.js"></script ---->
+    <script src="gui.js"></script>
+    <script src="text.js"></script>
+    <script src="TextB.js"></script>
+    <script src="TextC.js"></script>
+    <script src="objects.js"></script>
+    <script src="Squarex.js"></script>
+    <script src="Stairs.js"></script>
+    <script src="script.js"></script>
+
   </body>
 </html>
