@@ -11,7 +11,18 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150846335-1"></script>
     <script>
+      if (document.location.hostname.search("github") !== -1) {
+        // https://stackoverflow.com/questions/1251922/is-there-a-way-to-stop-google-analytics-counting-development-work-as-hits
+        //google analytics code goes here
 
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-150846335-1');
+      }
+
+      
     </script>
 
 
