@@ -252,79 +252,79 @@ function mouseReleased() {
 
 				*/
 				objects.splice(objs, 1);
-				dispatched = true;        
- //     }
-}
-}
-
-if (dispatched) return;
-
-if (gui_mode == 1) {
-	objects.push(new Column(mouseX, mouseY, 16));
-	dispatched = true;
-	gui_mode = 0;
-}
-
-if (dispatched) return;
-
-if (gui_mode == 2) {
-	objects.push(new Column(mouseX, mouseY, 12));
-	dispatched = true;
-	gui_mode = 0;
-}
-
-if (dispatched) return;
-
-if (gui_mode == 3) {
-	objects.push(new Scatter(mouseX, mouseY, 12));
-	dispatched = true;
-	gui_mode = 0;
-}
-
-if (dispatched) return;
-
-if (gui_mode == 4) {
-	gui_texts.push(new Text(mouseX, mouseY));
-	dispatched = true;
-	gui_mode = 0;
-}
-
-if (dispatched) return;
-
-if (gui_mode == 5) {
-	gui_texts.push(new TextB(mouseX, mouseY));
-	dispatched = true;
-	gui_mode = 0;
-}
-
-if (dispatched) return;
-
-if (gui_mode == 6) {
-	gui_texts.push(new TextC(mouseX, mouseY));
-	dispatched = true;
-	gui_mode = 0;
-}
-
-if (dispatched) return;
-
-if (gui_mode == 7 || gui_mode == 8 || gui_mode == 9 || gui_mode == 10) {
-	objects.push(new Stairs(mouseX, mouseY, gui_mode-7));
-	dispatched = true;
-	gui_mode = 0;
-}
-
-if (dispatched) return;
-
-
-for (var c=0; c<columns; c++) {
-	for (var r=0; r<columns; r++) {
-		if (squares[c][r].is_over(mouseX, mouseY)){
-			squares[c][r].onClick();
-
-			rooms.enable_walls(squares, c, r);
+				dispatched = true;
+			//     }
 		}
 	}
-}
+
+	if (dispatched) return;
+
+	if (gui_mode == 1) {
+		objects.push(new Column(mouseX, mouseY, 16));
+		dispatched = true;
+		gui_mode = 0;
+	}
+
+	if (dispatched) return;
+
+	if (gui_mode == 2) {
+		objects.push(new Column(mouseX, mouseY, 12));
+		dispatched = true;
+		gui_mode = 0;
+	}
+
+	if (dispatched) return;
+
+	if (gui_mode == 3) {
+		objects.push(new Scatter(mouseX, mouseY, 12));
+		dispatched = true;
+		gui_mode = 0;
+	}
+
+	if (dispatched) return;
+
+	if (gui_mode == 4) {
+		gui_texts.push(new Text(mouseX, mouseY));
+		dispatched = true;
+		gui_mode = 0;
+	}
+
+	if (dispatched) return;
+
+	if (gui_mode == 5) {
+		gui_texts.push(new TextB(mouseX, mouseY));
+		dispatched = true;
+		gui_mode = 0;
+	}
+
+	if (dispatched) return;
+
+	if (gui_mode == 6) {
+		gui_texts.push(new TextC(mouseX, mouseY));
+		dispatched = true;
+		gui_mode = 0;
+	}
+
+	if (dispatched) return;
+
+	if (gui_mode == 7 || gui_mode == 8 || gui_mode == 9 || gui_mode == 10) {
+		objects.push(new Stairs(mouseX, mouseY, gui_mode-7));
+		dispatched = true;
+		gui_mode = 0;
+	}
+
+	if (dispatched) return;
+
+
+	for (var c=0; c<columns; c++) {
+		for (var r=0; r<columns; r++) {
+			if (squares[c][r].is_over(mouseX, mouseY)){
+				squares[c][r].onClick();
+
+				rooms.enable_walls(squares, c, r);
+			}
+		}
+	}
 
 }
 
