@@ -1,7 +1,9 @@
 class Squarex {
-  constructor(x, y, size) {
-    this.x = x;
-    this.y = y;
+  constructor(c, r, size) {
+    this.c = c;
+    this.r = r;
+    this.x = c*size;
+    this.y = r*size;
     this.size = size;
     this.hover = false;
     this.enabled = false;
@@ -14,6 +16,20 @@ class Squarex {
 
     this.jitter = random();
     this.jitter_pos = 10;
+  }
+
+  save() {
+    // return a json representation of this object
+    return {
+      c: this.c,
+      r: this.r
+    };
+  }
+
+  load(data) {
+    //this.c = data.c;
+    //this.r = data.r;
+    this.enabled = true;
   }
 
   // walk down the random number

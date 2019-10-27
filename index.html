@@ -38,6 +38,13 @@
     Banners:
     <a href="javascript:gui_mode=5;">b1</a>
     <a href="javascript:gui_mode=6;">b2</a>
+    |
+    Save:
+    <a href="javascript:gui_mode=11;">.png</a>
+    <a href="javascript:gui_mode=12;">URL</a>
+    <a href="javascript:get_data_from_url();">Load URL</a>
+
+
 
     <hr>
     <pre id="#ascii85"></pre>
@@ -107,14 +114,18 @@
     </p>
     </div>
 
-    <!---- script src="ascii85/ascii85.js"></script ---->
+    <script src="ascii85/ascii85.js"></script>
+    <script src="pako/pako.js"></script>
+
     <script src="gui.js"></script>
     <script src="text.js"></script>
     <script src="TextB.js"></script>
     <script src="TextC.js"></script>
     <script src="objects.js"></script>
+    <script src="rooms.js"></script>
     <script src="Squarex.js"></script>
     <script src="Stairs.js"></script>
+    <script src="make_url.js"></script>
     <script src="script.js"></script>
 
   </body>
