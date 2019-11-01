@@ -18,18 +18,24 @@ function make_url() {
 	var myString = JSON.stringify(tmp);
 
 	//var input = "test string";
-//var output = pako.gzip(myString, { to: 'string' });
-var output = pako.deflate(myString, { to: 'string' });
+	//var output = pako.gzip(myString, { to: 'string' });
+	var output = pako.deflate(myString, { to: 'string' });
 
-// var token = ascii85.encode(output);
-// let compressed_data = ascii85.decode(token);
+	// var token = ascii85.encode(output);
+	// let compressed_data = ascii85.decode(token);
 
-var token = window.btoa(output);
-var compressed_data = window.atob(token);
+	var token = window.btoa(output);
+	//var compressed_data = window.atob(token);
+	// let json_string = pako.inflate(compressed_data, { to: 'string' });
+	// var myData = JSON.parse(json_string);
+	var url = document.getElementById("url");
+	var link = "http://localhost:8080/#" + token;
+	var a = "<a href=\"";
+	a += link;
+	a += "\">Your dungeon</a>";
 
-let json_string = pako.inflate(compressed_data, { to: 'string' });
-var myData = JSON.parse(json_string);
-
+	url.innerHTML = a;
+	modal.style.display = "block";
 }
 
 function get_data_from_url() {
@@ -45,4 +51,28 @@ function get_data_from_url() {
 	var myData = JSON.parse(json_string);
 
 	rooms.load(myData);
+}
+
+// Get the modal
+var modal = document.getElementById("myModal");
+
+// Get the button that opens the modal
+var btn = document.getElementById("myBtn");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function(event) {
+	modal.style.display = "none";
+	event.stopPropagation();
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+	if (event.target == modal) {
+		modal.style.display = "none";
+		event.stopPropagation();
+	}
 }

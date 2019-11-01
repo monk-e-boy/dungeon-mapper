@@ -75,7 +75,7 @@ class TextB extends Text {
 			vertex(x,       y+y1);
 			vertex(x+width, y-y1);
 
-		 else if (width < 120) {
+		} else if (width < 120) {
 			// two lines
 			let y1 = (this.next_rand() - 0.5) * 3;
 			let y2 = (this.next_rand() - 0.5) * 3;
@@ -85,7 +85,7 @@ class TextB extends Text {
 			vertex(x+width/2, y-y1);
 			vertex(x+width,   y+y2);
 
-		 else {
+		} else {
 
 			let y1 = (this.next_rand() - 0.5) * 3;
 			let y2 = (this.next_rand() - 0.5) * 3;
