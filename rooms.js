@@ -26,40 +26,40 @@ class Rooms {
 	enable_walls(squares, c, r) {
 
 		// turn borders OFF if the square is enabled
-	    var on = ! squares[c][r].enabled;
+		var on = ! squares[c][r].enabled;
 
-	    // left
-	    if (c>1) {
-		    if (squares[c-1][r].enabled) {
-		      squares[c][r].left = on;
-		      squares[c-1][r].right = on;
-		    }	
-	    }
-	    
-	    // right
-	    if (c<this.columns-1) {
-		    if (squares[c+1][r].enabled) {
-		      squares[c][r].right = on;
-		      squares[c+1][r].left = on;
-		    }	
-	    }
-	    
-	    // row above
-	    if (r>0) {
-		    if (squares[c][r-1].enabled) {
-		      squares[c][r].top = on;
-		      squares[c][r-1].bottom = on;
-		    }	
-	    }
-	    
-	    // row below
-	    if (r < this.rows-1) {
-		    if (squares[c][r+1].enabled) {
-		      squares[c][r].bottom = on;
-		      squares[c][r+1].top = on;
-		    }	
-	    }
-	    
+		// left
+		if (c>1) {
+			if (squares[c-1][r].enabled) {
+				squares[c][r].left = on;
+				squares[c-1][r].right = on;
+			}
+		}
+
+		// right
+		if (c<this.columns-1) {
+			if (squares[c+1][r].enabled) {
+				squares[c][r].right = on;
+				squares[c+1][r].left = on;
+			}
+		}
+
+		// row above
+		if (r>0) {
+			if (squares[c][r-1].enabled) {
+				squares[c][r].top = on;
+				squares[c][r-1].bottom = on;
+			}
+		}
+
+		// row below
+		if (r < this.rows-1) {
+			if (squares[c][r+1].enabled) {
+				squares[c][r].bottom = on;
+				squares[c][r+1].top = on;
+			}
+		}
+
 	}
 
 	load(data) {

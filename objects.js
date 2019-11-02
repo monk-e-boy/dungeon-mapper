@@ -1,3 +1,28 @@
+class Objects {
+
+	load(data) {
+
+		// this.reset();
+
+		// TODO: remove this ugly global
+		objects = [];
+
+		for (let i=0; i<data.length; i++) {
+			let c = data[i];
+			if (c.t == 0) {
+				objects.push(new Column(c.x, c.y, c.s));
+			} else if (c.t == 1) {
+				let s = new Scatter(c.x, c.y, c.s);
+				s.jitter = c.j;
+				objects.push(s);
+			} else if (c.t == 2) {
+				objects.push(new Stairs(c.x, c.y, c.d));
+			}
+		}
+	}
+}
+
+
 class Column {
 	constructor(x, y, size) {
 		this.x = x;
@@ -20,6 +45,16 @@ class Column {
 	next_rand_between(min, max) {
 		let r = this.next_rand();
 		return min + (r * (max - min));
+	}
+
+	save() {
+		// return a json representation of this object
+		return {
+			t: 0, // <-- type
+			x: this.x,
+			y: this.y,
+			s: this.size
+		};
 	}
 
 	is_over(x, y) {
@@ -71,6 +106,18 @@ class Column {
 class Scatter extends Column {
 	constructor(x, y, size) {
 		super(x, y, size);
+		this.life = 3;
+	}
+
+	save() {
+		// return a json representation of this object
+		return {
+			t: 1, // <-- type
+			x: this.x,
+			y: this.y,
+			s: this.size,
+			j: this.jitter
+		};
 	}
 
 	display() {
@@ -98,7 +145,21 @@ class Scatter extends Column {
 
 			this.stone(this.x+sx, this.y+sy, size, 9);
 
-		}    
+		}
+
+		// Not sure if I'll keep this, but this shows the current life
+		// keep clicking to kill it
+		if (this.hover) {
+			textAlign(LEFT);
+			textSize(14);
+			textFont(font);
+			var bbox = font.textBounds(this.life.toString(), this.x, this.y, 14, LEFT);
+
+			noStroke();
+			fill('#000000');
+			text(this.life.toString(), this.x-bbox.w/2, this.y);
+
+		}
 	}
 
 }

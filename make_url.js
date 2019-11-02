@@ -15,7 +15,16 @@ function make_url() {
 		}
 	}
 
-	var myString = JSON.stringify(tmp);
+	let tmp2 = [];
+
+	for (let objs=0; objs<objects.length; objs++) {
+		tmp2.push(objects[objs].save());
+	}
+
+	var myString = JSON.stringify({
+		rooms: tmp,
+		objects: tmp2
+	});
 
 	//var input = "test string";
 	//var output = pako.gzip(myString, { to: 'string' });
@@ -48,9 +57,10 @@ function get_data_from_url() {
 	var compressed_data = window.atob(token);
 
 	let json_string = pako.inflate(compressed_data, { to: 'string' });
-	var myData = JSON.parse(json_string);
+	var data = JSON.parse(json_string);
 
-	rooms.load(myData);
+	rooms.load(data.rooms);
+	_object.load(data.objects)
 }
 
 // Get the modal

@@ -5,6 +5,7 @@
 
 
 let rooms = null;
+let _object = null;
 var squares = [];
 var columns = 25;
 var mouse_mode = 1;
@@ -40,6 +41,7 @@ function setup() {
 	var size = 30;
 
 	rooms = new Rooms(columns, columns, size);
+	_object = new Objects();
 
 }
 
@@ -232,6 +234,8 @@ function mouseReleased() {
 		objects[objs].hover_state();
 		if (objects[objs].is_over(mouseX, mouseY)) {
 
+			// This was an attempt to rotate stairs
+			// for now, there are 4 types of stairs
 			// UGH!! TODO Fix this crap:
 			// either make boulders rotateable (? sounds stupid)
 			// or give them a .dead status? (sounds stupid)
@@ -251,8 +255,21 @@ function mouseReleased() {
 			} else {
 
 				*/
-				objects.splice(objs, 1);
+
+				// Reconfigurable scatter boulders
+
+				var o = objects[objs];
+
+				if (o.life && o.life > 0) {
+					o.life--;
+					o.jitter = random();
+				} else {
+					objects.splice(objs, 1);
+				}
+
 				dispatched = true;
+
+
 			//     }
 		}
 	}

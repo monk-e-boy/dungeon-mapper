@@ -13,6 +13,16 @@ class Stairs {
 		this.jitter_pos = 10;
 	}
 
+	save() {
+		// return a json representation of this object
+		return {
+			t: 2, // <-- type
+			x: this.x,
+			y: this.y,
+			d: this.direction
+		};
+	}
+
 	// walk down the random number
 	next_rand() {
 		this.jitter_pos *= 10;
