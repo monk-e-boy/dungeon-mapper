@@ -74,7 +74,7 @@ function draw() {
 	let dispatched = false;
 
 	// has the user selected to place an item on the canvas?
-	if ( gui_mode != 0 ) {
+	if ( gui_mode > 0 ) {
 		cursor(CROSS);
 		dispatched = true;
 	} else {
@@ -168,7 +168,10 @@ function draw() {
 function mousePressed() {
 
 	gui_texts.forEach(function(text) {
-		if (text.active) {
+		// User has clicked away from an active
+		// text box
+		var tmp = text.is_over(mouseX, mouseY);
+		if (text.active && !text.is_over(mouseX, mouseY)) {
 			text.active = false;
 			gui_mode = -1;  // ignore mouse up event
 		}

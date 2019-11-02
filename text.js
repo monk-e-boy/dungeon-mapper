@@ -26,7 +26,7 @@ class Text {
 
 		}
 		else {
-			if ( !this.hover ) {
+			if ( !(this.hover || this.active) ) {
 				return x > this.bbox.x &&
 				y > this.bbox.y &&
 				x < this.bbox.x + this.bbox.w &&
