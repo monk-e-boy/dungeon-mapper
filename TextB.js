@@ -4,6 +4,8 @@ class TextB extends Text {
 		this.jitter = random();
 		this.jitter_pos = 10;
 		this.padding_bottom = 6;
+
+		this.save_type = 1;
 	}
 
 	// walk down the random number
@@ -14,7 +16,18 @@ class TextB extends Text {
 		return (this.jitter * this.jitter_pos) % 1;
 	}
 
-	//display() {
+	save() {
+		// return a json representation of this object
+		return {
+			t: this.save_type, // <-- type
+			x: this.x,
+			y: this.y,
+			v: this.text,
+			s: this.fontSize,
+			j: this.jitter
+		};
+	}
+
 	display_decorations() {
 
 		this.jitter_pos = 10;

@@ -18,6 +18,45 @@ class Text {
 		this.bbox = false;
 
 		this.is_dead = false;
+
+		// used to determine the saved data type
+		// re-inflated via the factory method
+		this.save_type = 0;
+	}
+
+	save() {
+		// return a json representation of this object
+		return {
+			t: this.save_type,
+			x: this.x,
+			y: this.y,
+			v: this.text,	// value (t is used for type)
+			s: this.fontSize
+		};
+	}
+
+	static factory(data) {
+		let txt = null;
+
+		if (data.t == 0)
+			txt = new Text(data.x, data.y);
+
+		if (data.t == 1) {
+			txt = new TextB(data.x, data.y);
+			txt.jitter = data.j;
+		}
+
+		if (data.t == 2) {
+			txt = new TextC(data.x, data.y);
+			txt.jitter = data.j;
+		}
+
+		
+		txt.text = data.v;
+		txt.fontSize = data.s;
+		txt.editing = false;
+		txt.active = false;
+		return txt;
 	}
 
 	is_over(x, y) {

@@ -21,9 +21,16 @@ function make_url() {
 		tmp2.push(objects[objs].save());
 	}
 
+	let tmp3 = [];
+
+	gui_texts.forEach(function(text) {
+		tmp3.push(text.save());
+	});
+
 	var myString = JSON.stringify({
 		rooms: tmp,
-		objects: tmp2
+		objects: tmp2,
+		texts: tmp3
 	});
 
 	//var input = "test string";
@@ -60,7 +67,14 @@ function get_data_from_url() {
 	var data = JSON.parse(json_string);
 
 	rooms.load(data.rooms);
-	_object.load(data.objects)
+	_object.load(data.objects);
+
+
+	gui_texts = [];
+	for (let i=0; i<data.texts.length; i++) {
+		gui_texts.push(Text.factory(data.texts[i]));
+	}
+	
 }
 
 // Get the modal

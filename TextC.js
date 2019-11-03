@@ -1,6 +1,8 @@
 class TextC extends TextB {
 	constructor(x, y) {
 		super(x, y);
+
+		this.save_type = 2;
 	}
 
 	go_font() {
