@@ -17,7 +17,11 @@ class TextB extends Text {
 	}
 
 	save() {
-		// return a json representation of this object
+		let s = super.save();
+		s.j = this.jitter;
+		return s;
+
+		/*/ return a json representation of this object
 		return {
 			t: this.save_type, // <-- type
 			x: this.x,
@@ -26,6 +30,7 @@ class TextB extends Text {
 			s: this.fontSize,
 			j: this.jitter
 		};
+		*/
 	}
 
 	display_decorations() {
