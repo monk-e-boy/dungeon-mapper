@@ -20,17 +20,6 @@ class TextB extends Text {
 		let s = super.save();
 		s.j = this.jitter;
 		return s;
-
-		/*/ return a json representation of this object
-		return {
-			t: this.save_type, // <-- type
-			x: this.x,
-			y: this.y,
-			v: this.text,
-			s: this.fontSize,
-			j: this.jitter
-		};
-		*/
 	}
 
 	display_decorations() {
