@@ -45,6 +45,15 @@
     Banners:
     <a href="javascript:gui_mode=5;">b1</a>
     <a href="javascript:gui_mode=6;">b2</a>
+    |
+    Save:
+    <a href="javascript:gui_mode=11;">.png</a>
+    <a href="javascript:gui_mode=12;">URL</a>
+    |
+    Re-load: 
+    <a href="javascript:get_data_from_url();">URL token</a>
+
+
 
     <hr>
     <pre id="#ascii85"></pre>
@@ -110,19 +119,48 @@
         Tip 8: It's not a dungeon, it's a market, a crashed spaceship, a fallen tower, a sea cave, a mansion, a fort, mud huts, termite mound, guts of a giant worm, bee hive, rotten tree.
     </p>
     <p>
-        Tip 9: Snipping tool. Win + SHIT + s. <a href="https://www.getpaint.net/">paint.net</a>
+        Tip 9: Snipping tool. Win + SHIFT + s. <a href="https://www.getpaint.net/">paint.net</a>
     </p>
     </div>
 
-    <!---- script src="ascii85/ascii85.js"></script ---->
+<!-- The Modal -->
+<!-- https://www.w3schools.com/howto/howto_css_modals.asp -->
+<div id="myModal" class="modal">
+
+<!-- Modal content -->
+<div class="modal-content">
+  <div class="modal-header">
+    <span class="close">&times;</span>
+    <h2>Modal Header</h2>
+  </div>
+  <div class="modal-body">
+    <p>This is the URL to this dungeon:</p>
+    <p id="url"></p>
+    <p>Right click → copy link address</p>
+  </div>
+  <div class="modal-footer">
+    <h3>Modal Footer</h3>
+  </div>
+</div>
+
+</div>
+
+
+    <script src="ascii85/ascii85.js"></script>
+    <script src="pako/pako.js"></script>
+
     <script src="gui.js"></script>
     <script src="text.js"></script>
     <script src="TextB.js"></script>
     <script src="TextC.js"></script>
     <script src="objects.js"></script>
+    <script src="rooms.js"></script>
     <script src="Squarex.js"></script>
     <script src="Stairs.js"></script>
+    <script src="make_url.js"></script>
     <script src="script.js"></script>
+
+
 
   </body>
 </html>
