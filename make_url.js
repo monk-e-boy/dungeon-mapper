@@ -46,7 +46,7 @@ function make_url() {
 	// var myData = JSON.parse(json_string);
 	var url = document.getElementById("url");
 	//var link = "http://localhost:8080/#" + token;
-	var link = window.location.origin + "/#" + token;
+	var link = window.location.origin + window.location.pathname + "#" + token;
 	var a = "<a href=\"";
 	a += link;
 	a += "\">Your dungeon</a>";
