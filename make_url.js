@@ -45,7 +45,8 @@ function make_url() {
 	// let json_string = pako.inflate(compressed_data, { to: 'string' });
 	// var myData = JSON.parse(json_string);
 	var url = document.getElementById("url");
-	var link = "http://localhost:8080/#" + token;
+	//var link = "http://localhost:8080/#" + token;
+	var link = window.location.origin + "/#" + token;
 	var a = "<a href=\"";
 	a += link;
 	a += "\">Your dungeon</a>";
