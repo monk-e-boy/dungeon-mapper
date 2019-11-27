@@ -14,9 +14,15 @@ let font2, fontsize2 = 32;
 let font_LaBelleAurore;
 let objects = [];
 let gui_texts = [];
+let lines = [];
 
-let gui_mode = 0;
+// MODES:
+let mode_none = 0;
+// line modes:
+let mode_drag = 132;
+let mode_add_points = 131;
 
+let gui_mode = mode_none;
 
 function preload() {
 	// Ensure the .ttf or .otf font stored in the assets directory
@@ -66,6 +72,12 @@ function draw() {
 		if (gui_texts[objs].is_dead) {
 			gui_texts.splice(objs, 1);
 		}
+	}
+
+	for (let i=0; i<lines.length; i++) {
+		if(lines[i].dead)
+			lines.splice(i, 1);
+
 	}
 	//
 	// END TODO
@@ -152,6 +164,12 @@ function draw() {
 				squares[c][r].display();
 			}
 		}
+	}
+
+	// curved walls
+	for (let i=0; i<lines.length; i++) {
+		let curve = lines[i];
+		curve.render();
 	}
 
 	for (let objs=0; objs<objects.length; objs++) {
@@ -335,6 +353,35 @@ function mouseReleased() {
 
 	if (dispatched) return;
 
+	if (gui_mode == 13) {
+		let w = new InternalWall();
+		lines.push(w);
+		w.add(mouseX, mouseY);
+
+		dispatched = true;
+		gui_mode = mode_add_points;
+		// mode = mode_add_points;
+	}
+
+	if (dispatched) return;
+
+	if (gui_mode == mode_add_points) {
+
+		let curve = lines[lines.length-1];
+		if (curve.points.length > 0 && curve.points[0].is_over()) {
+			// clicked on first element in line
+			curve.closed = true;
+			curve.editing = false;
+			gui_mode = mode_none;
+		} else {
+			curve.add(mouseX, mouseY);
+		}
+		dispatched = true;
+		// NOTE: we DO NOT change the mode - use key press ESC to stop adding points
+	}
+
+	if (dispatched) return;
+
 
 	for (var c=0; c<columns; c++) {
 		for (var r=0; r<columns; r++) {
@@ -375,7 +422,13 @@ function keyPressed() {
 				text.active = false;
 			}
 		});
+
+		// stop adding points to a curve
+		gui_mode = mode_none;
+		let curve = lines[lines.length-1];
+		curve.editing = false;
 	}
+
 
 	if (keyCode === RETURN) {
 		gui_texts.forEach(function(text) {
