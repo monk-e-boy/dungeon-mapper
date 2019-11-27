@@ -32,7 +32,7 @@ class Buttonx {
  	}
 }
 
-class RemoveButton extends Buttonx {
+class RemoveButton2 extends Buttonx {
 
 	mouseReleased() {
 		this.parent.delete();
@@ -43,6 +43,43 @@ class RemoveButton extends Buttonx {
 		fill(255,50,50);
 		circle(this.x, this.y, this.size);
  	}
+}
+
+class RemoveButton extends Buttonx {
+
+	mouseReleased() {
+		this.parent.delete();
+	}
+
+	render() {
+//		let x = this.bbox.x + this.bbox.w + 8;
+//		let y = this.bbox.y+(this.bbox.h/2) - 8;
+		let size = 13;
+		let is_over = dist(mouseX, mouseY, this.x, this.y) < 8;
+		if (is_over)
+		{
+			// drop shadow
+			fill(140,140,140,125);
+			noStroke();
+			circle(this.x, this.y+1, size + 4);
+
+			fill(238,17,17);
+		} else {
+			fill("#ffffff");
+		}
+
+		stroke("#000000");
+		strokeWeight(1);
+		// - dec font size
+		push();
+		translate(this.x, this.y);
+		circle(0, 0, size);
+		if (is_over)
+			stroke("#ffffff");
+		line(-4, -4, 4, 4);
+		line(4, -4, -4, 4);
+		pop();
+	}
 }
 
 class AddButton extends Buttonx {

@@ -171,7 +171,7 @@ class InternalWall {
    
 
     stroke(176,196,222);
-    if (mouse_near_curve || /* TODO: global var*/ gui_mode == mode_add_points) {
+    if (mouse_near_curve || /* TODO: global var */ gui_mode == mode_add_points) {
       for (var c=0; c<this.points.length; c++) {
         this.points[c].render();
       } 

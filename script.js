@@ -124,6 +124,13 @@ function draw() {
 	}
 
 	if ( !dispatched ) {
+		for (let i=0; i<lines.length; i++) {
+			if (lines[i].is_mouse_near_me() )
+				dispatched = true;
+		}
+	}
+
+	if ( !dispatched ) {
 		for (var c=0; c<columns; c++) {
 			for (var r=0; r<columns; r++) {
 				squares[c][r].hover_state(squares[c][r].is_over(mouseX, mouseY));
@@ -168,8 +175,7 @@ function draw() {
 
 	// curved walls
 	for (let i=0; i<lines.length; i++) {
-		let curve = lines[i];
-		curve.render();
+		lines[i].render();
 	}
 
 	for (let objs=0; objs<objects.length; objs++) {
