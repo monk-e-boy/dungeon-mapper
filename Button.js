@@ -11,7 +11,7 @@ class Buttonx {
 
 	is_over(x, y) {
 		let d = int(dist(x, y, this.x, this.y));
-		if (d < this.size) {
+		if (d < this.size/2) {
 			return true;
 		}
 		return false;
@@ -51,17 +51,15 @@ class RemoveButton extends Buttonx {
 		this.parent.delete();
 	}
 
-	render() {
-//		let x = this.bbox.x + this.bbox.w + 8;
-//		let y = this.bbox.y+(this.bbox.h/2) - 8;
-		let size = 13;
-		let is_over = dist(mouseX, mouseY, this.x, this.y) < 8;
-		if (is_over)
-		{
+	render(mouse_x, mouse_y) {
+
+		this.size = 13;
+		let is_over = this.is_over(mouse_x, mouse_y);
+		if (is_over) {
 			// drop shadow
 			fill(140,140,140,125);
 			noStroke();
-			circle(this.x, this.y+1, size + 4);
+			circle(this.x, this.y+1, this.size + 4);
 
 			fill(238,17,17);
 		} else {
@@ -73,7 +71,7 @@ class RemoveButton extends Buttonx {
 		// - dec font size
 		push();
 		translate(this.x, this.y);
-		circle(0, 0, size);
+		circle(0, 0, this.size);
 		if (is_over)
 			stroke("#ffffff");
 		line(-4, -4, 4, 4);
@@ -88,10 +86,29 @@ class AddButton extends Buttonx {
 		this.parent.add_point();
 	}
 
-	render() {
-		// add point
-		fill(50,255,50);
-		circle(this.x, this.y, this.size);
+	render(mouse_x, mouse_y) {
+		
+		this.size = 13;
+		if (this.is_over(mouse_x, mouse_y)) {
+
+			// drop shadow
+			fill(140,140,140,125);
+			noStroke();
+			circle(this.x, this.y+1, this.size + 4);
+			fill(255, 204, 0);
+		} else {
+			fill("#ffffff");
+		}
+
+		stroke(0);
+		strokeWeight(1);
+		// + inc font size
+		push();
+		translate(this.x, this.y);
+		circle(0, 0, 13);
+		line(-4, 0, 4, 0);
+		line(0, -4, 0, 4);
+		pop();
  	}
 }
 
