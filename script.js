@@ -45,11 +45,12 @@ function setup() {
 	textSize(fontsize);
 	textAlign(CENTER, CENTER);
 
-
 	var size = 30;
 
 	rooms = new Rooms(columns, columns, size);
 	_object = new Objects();
+
+	get_data_from_url();
 
 	//  https://github.com/zenozeng/p5.js-pdf
 

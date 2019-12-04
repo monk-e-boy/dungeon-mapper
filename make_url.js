@@ -27,10 +27,16 @@ function make_url() {
 		tmp3.push(text.save());
 	});
 
+	let tmp4 = [];
+	for (let i=0; i<lines.length; i++) {
+		tmp4.push(lines[i].save());
+	}
+
 	var myString = JSON.stringify({
 		rooms: tmp,
 		objects: tmp2,
-		texts: tmp3
+		texts: tmp3,
+		lines: tmp4
 	});
 
 	//var input = "test string";
@@ -74,6 +80,11 @@ function get_data_from_url() {
 	gui_texts = [];
 	for (let i=0; i<data.texts.length; i++) {
 		gui_texts.push(Text.factory(data.texts[i]));
+	}
+
+	lines = [];
+	for (let i=0; i<data.lines.length; i++) {
+		lines.push(InternalWall.factory(data.lines[i]));
 	}
 	
 }

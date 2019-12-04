@@ -17,6 +17,28 @@ class InternalWall {
 		this.dead = false;
 	}
 
+	// return a json representation of this object
+	save() {
+		let p = [];
+		for (let i=0; i< this.points.length; i++) {
+			p.push([this.points[i].x, this.points[i].y]);
+		}
+		return {
+			p: p
+		};
+	}
+
+	static factory(data) {
+		let wall = new InternalWall();
+		for (let i=0; i< data.p.length; i++) {
+			wall.points.push(
+				new CurvePoint(data.p[i][0], data.p[i][1])
+			);
+		}
+		wall.editing = false;
+		return wall;
+	}
+
 	// TODO merge with other curved lines
 	add_point() {
 		let end = this.points[this.points.length-1];
@@ -38,7 +60,7 @@ class InternalWall {
 	}
 
 	add(x, y) {
-		this.points.push(new CurvePoint(x, y));
+		this.points.push(new CurvePoint(Math.floor(x), Math.floor(y)));
 	}
 
 	delete() {
@@ -139,8 +161,9 @@ class InternalWall {
 			if (this.editing) {
 				// user is dragging a point around.
 				// add mouse position into the curved line:
-				myPoints.push(mouseX);
-				myPoints.push(mouseY);
+				// sometimtes the mouse pos is a float
+				myPoints.push(Math.floor(mouseX));
+				myPoints.push(Math.floor(mouseY));
 
 				// DEBUG HELP: change the colour to RED to
 				// see the line clearly:
