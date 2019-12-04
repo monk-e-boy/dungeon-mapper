@@ -117,6 +117,7 @@ class Squarex {
 
 	display() {
 
+/*
 		if (this.enabled)
 			if(this.hover)
 				fill(255, 255, 255);
@@ -127,6 +128,18 @@ class Squarex {
 				fill(255, 204, 0);
 			else
 				fill(255, 255, 255);
+*/
+
+		if (this.enabled)
+			if(this.hover)
+				fill(255, 204, 0);
+			else
+				fill(255, 255, 255);
+		else
+			if (this.hover)
+				fill(255, 204, 0);
+			else
+				fill(224, 224, 224);
 
 		noStroke();
 
