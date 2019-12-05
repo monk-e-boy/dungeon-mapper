@@ -39,6 +39,8 @@
     <a class="arrow" href="javascript:gui_mode=8;">&#8678;</a>
     <a class="arrow" href="javascript:gui_mode=10;">&#8680;</a>
     |
+    <a href="javascript:gui_mode=13;">Line</a>
+    |
     Text:
     <a href="javascript:gui_mode=4;">text</a>
     |
@@ -131,15 +133,17 @@
 <div class="modal-content">
   <div class="modal-header">
     <span class="close">&times;</span>
-    <h2>Header</h2>
+    <h2>Save Dungeon to URL token</h2>
   </div>
   <div class="modal-body">
     <p>This is the URL to this dungeon:</p>
     <p id="url"></p>
+    <p>Things to do with this URL:<p>
+    <p>Right click → open in new tab</p>
     <p>Right click → copy link address</p>
   </div>
   <div class="modal-footer">
-    <h3>Footer</h3>
+    <h3>End</h3>
   </div>
 </div>
 
@@ -149,12 +153,17 @@
     <script src="ascii85/ascii85.js"></script>
     <script src="pako/pako.js"></script>
 
+    <script src="CurvePoint.js"></script>
+    <script src="Button.js"></script>
+    <script src="curve.js"></script>
+    <script src="Rand.js"></script>
     <script src="gui.js"></script>
     <script src="text.js"></script>
     <script src="TextB.js"></script>
     <script src="TextC.js"></script>
     <script src="objects.js"></script>
     <script src="rooms.js"></script>
+    <script src="InternalWall.js"></script>
     <script src="Squarex.js"></script>
     <script src="Stairs.js"></script>
     <script src="make_url.js"></script>

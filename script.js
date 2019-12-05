@@ -14,9 +14,17 @@ let font2, fontsize2 = 32;
 let font_LaBelleAurore;
 let objects = [];
 let gui_texts = [];
+let lines = [];
+// dragging a point in a line:
+let drag_point = null;
 
-let gui_mode = 0;
+// MODES:
+let mode_none = 0;
+// line modes:
+let mode_drag = 132;
+let mode_add_points = 131;
 
+let gui_mode = mode_none;
 
 function preload() {
 	// Ensure the .ttf or .otf font stored in the assets directory
@@ -37,11 +45,14 @@ function setup() {
 	textSize(fontsize);
 	textAlign(CENTER, CENTER);
 
-
 	var size = 30;
 
 	rooms = new Rooms(columns, columns, size);
 	_object = new Objects();
+
+	get_data_from_url();
+
+	//  https://github.com/zenozeng/p5.js-pdf
 
 }
 
@@ -66,6 +77,12 @@ function draw() {
 		if (gui_texts[objs].is_dead) {
 			gui_texts.splice(objs, 1);
 		}
+	}
+
+	for (let i=0; i<lines.length; i++) {
+		if(lines[i].dead)
+			lines.splice(i, 1);
+
 	}
 	//
 	// END TODO
@@ -112,6 +129,13 @@ function draw() {
 	}
 
 	if ( !dispatched ) {
+		for (let i=0; i<lines.length; i++) {
+			if (lines[i].is_mouse_near_me() )
+				dispatched = true;
+		}
+	}
+
+	if ( !dispatched ) {
 		for (var c=0; c<columns; c++) {
 			for (var r=0; r<columns; r++) {
 				squares[c][r].hover_state(squares[c][r].is_over(mouseX, mouseY));
@@ -124,6 +148,12 @@ function draw() {
 			}
 		}
 	}
+
+	//
+	//
+	// DRAWING
+	//
+	//
 
 
 	// draw the unimportant stuff first
@@ -152,6 +182,16 @@ function draw() {
 				squares[c][r].display();
 			}
 		}
+	}
+
+	if (gui_mode == mode_drag) {
+		drag_point.x = mouseX;
+		drag_point.y = mouseY;
+	}
+
+	// curved walls
+	for (let i=0; i<lines.length; i++) {
+		lines[i].render();
 	}
 
 	for (let objs=0; objs<objects.length; objs++) {
@@ -188,6 +228,23 @@ function mousePressed() {
 		});
 	}
 
+	//
+	// curved walls
+	//
+	if (!dispatched) {
+
+		let is_near = false;
+
+		for(let i=0; i<lines.length; i++) {
+			let curve = lines[i];
+			for (var c=0; c<curve.points.length; c++) {
+				if (curve.points[c].is_near()) {
+					drag_point = curve.points[c];
+					gui_mode = mode_drag;
+				}
+			}
+		}
+	}
 }
 
 function mouseDragged() {
@@ -202,6 +259,10 @@ function mouseDragged() {
 
 
 function mouseReleased() {
+	if (gui_mode == mode_drag) {
+		// user was dragging internal wall
+		gui_mode = mode_none;
+	}
 
 	// user is clicking to STOP editing text
 	// see mousePressed for details
@@ -335,6 +396,45 @@ function mouseReleased() {
 
 	if (dispatched) return;
 
+	if (gui_mode == 13) {
+		let w = new InternalWall();
+		lines.push(w);
+		w.add(mouseX, mouseY);
+
+		dispatched = true;
+		gui_mode = mode_add_points;
+	}
+
+	if (dispatched) return;
+
+	if (gui_mode == mode_add_points) {
+
+		let curve = lines[lines.length-1];
+		if (curve.points.length > 0 && curve.points[0].is_over()) {
+			// clicked on first element in line
+			curve.closed = true;
+			curve.editing = false;
+			gui_mode = mode_none;
+		} else {
+			curve.add(mouseX, mouseY);
+		}
+		dispatched = true;
+		// NOTE: we DO NOT change the mode - use key
+		// press ESC to stop adding points
+	}
+
+	if (dispatched) return;
+
+	for(let i=0; i<lines.length; i++) {
+		let curve = lines[i];
+
+     	if (curve.is_mouse_near_me() && !dispatched) {
+     		curve.mouseReleased();
+     		dispatched = true;
+     	}
+    }
+
+    if (dispatched) return;
 
 	for (var c=0; c<columns; c++) {
 		for (var r=0; r<columns; r++) {
@@ -375,7 +475,13 @@ function keyPressed() {
 				text.active = false;
 			}
 		});
+
+		// stop adding points to a curve
+		gui_mode = mode_none;
+		let curve = lines[lines.length-1];
+		curve.editing = false;
 	}
+
 
 	if (keyCode === RETURN) {
 		gui_texts.forEach(function(text) {
