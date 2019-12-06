@@ -1,6 +1,6 @@
 class Rand {
   constructor() {
-  	randomSeed(99);
+  	// randomSeed(99);
 	this.jitter = random();
     this.jitter_pos = 10;
   }

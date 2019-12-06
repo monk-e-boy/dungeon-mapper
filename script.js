@@ -15,6 +15,8 @@ let font_LaBelleAurore;
 let objects = [];
 let gui_texts = [];
 let lines = [];
+let walls = [];
+
 // dragging a point in a line:
 let drag_point = null;
 
@@ -25,6 +27,16 @@ let mode_drag = 132;
 let mode_add_points = 131;
 
 let gui_mode = mode_none;
+
+function toggle_gui_mode(mode) {
+	if (gui_mode == mode_none) {
+		gui_mode = mode;
+	} else {
+		gui_mode = mode_none;
+	}
+	var element = document.getElementById("toolbar-button-"+mode);
+  	element.classList.toggle("toggle-on");
+}
 
 function preload() {
 	// Ensure the .ttf or .otf font stored in the assets directory
@@ -135,6 +147,8 @@ function draw() {
 		}
 	}
 
+
+
 	if ( !dispatched ) {
 		for (var c=0; c<columns; c++) {
 			for (var r=0; r<columns; r++) {
@@ -175,11 +189,40 @@ function draw() {
 		}
 	}
 
-	// walls
+	// rooms and external walls
 	for (var c=0; c<columns; c++) {
 		for (var r=0; r<columns; r++) {
 			if (squares[c][r].enabled) {
 				squares[c][r].display();
+			}
+		}
+	}
+
+	// internal walls
+	for (let i=0; i<walls.length; i++) {
+		walls[i].display();
+	}
+
+	if (gui_mode == 14) {
+		//
+		// draw internal walls
+		//
+		for (var c=0; c<columns; c++) {
+			for (var r=0; r<columns; r++) {
+				if (squares[c][r].enabled) {
+					let s = squares[c][r];
+					if (!s.top) {
+						if (mouseY > s.y - 7 && mouseY < s.y + 7 &&
+							mouseX > s.x && mouseX < s.x + s.size) {
+
+							fill(255, 204, 0, 127);
+							stroke(255, 204, 0);
+
+							rect(s.x, s.y - 3, s.size, 6);
+						}
+					}
+					
+				}
 			}
 		}
 	}
@@ -403,6 +446,51 @@ function mouseReleased() {
 
 		dispatched = true;
 		gui_mode = mode_add_points;
+	}
+
+	if (dispatched) return;
+
+	if (gui_mode == 14) {
+		
+
+
+		for (var c=0; c<columns; c++) {
+			for (var r=0; r<columns; r++) {
+				if (squares[c][r].enabled) {
+					let s = squares[c][r];
+					if (!s.top) {
+						if (mouseY > s.y - 7 && mouseY < s.y + 7 &&
+							mouseX > s.x && mouseX < s.x + s.size) {
+
+							//fill(255, 204, 0, 127);
+							//stroke(255, 204, 0);
+
+							//rect(s.x, s.y - 3, s.size, 6);
+
+							let removed = false;
+							for (let zz=0; zz<walls.length; zz++) {
+								if (walls[zz].parent == s) {
+									walls.splice(zz, 1);
+									removed = true;
+								}
+							}
+
+							if (!removed) {
+								let w = new Wall(s);
+								walls.push(w);
+
+							}
+							//w.add(mouseX, mouseY);
+
+							dispatched = true;
+							// gui_mode = mode_none;
+						}
+					}
+					
+				}
+			}
+		}
+
 	}
 
 	if (dispatched) return;
