@@ -205,7 +205,7 @@ function draw() {
 
 	if (gui_mode == 14) {
 		//
-		// draw internal walls
+		// draw internal walls - highlight / hover event
 		//
 		for (var c=0; c<columns; c++) {
 			for (var r=0; r<columns; r++) {
@@ -219,6 +219,17 @@ function draw() {
 							stroke(255, 204, 0);
 
 							rect(s.x, s.y - 3, s.size, 6);
+						}
+					}
+
+					if (!s.left) {
+						if (mouseY > s.y && mouseY < s.y + s.size &&
+							mouseX > s.x - 7 && mouseX < s.x + 7) {
+
+							fill(255, 204, 0, 127);
+							stroke(255, 204, 0);
+
+							rect(s.x-3, s.y, 6, s.size);
 						}
 					}
 					
@@ -297,6 +308,50 @@ function mouseDragged() {
 			text.y = text.active_offset_y + mouseY;
 		}
 	});
+}
+
+
+function mouseReleased_internal_wall() {
+	let dispatched = false;
+
+	let removed = false;
+	for (let zz=0; zz<walls.length; zz++) {
+		if (walls[zz].is_near(mouseX, mouseY)) {
+			walls.splice(zz, 1);
+			removed = true;
+		}
+	}
+
+	if (removed) return true;
+
+	for (var c=0; c<columns; c++) {
+		for (var r=0; r<columns; r++) {
+			if (squares[c][r].enabled) {
+				let s = squares[c][r];
+				if (!s.top) {
+					if (mouseY > s.y - 7 && mouseY < s.y + 7 &&
+						mouseX > s.x && mouseX < s.x + s.size) {
+
+						let w = new Wall(s);
+						walls.push(w);
+						dispatched = true;
+					}
+				}
+
+				if (!s.left) {
+					if (mouseY > s.y && mouseY < s.y + s.size &&
+						mouseX > s.x - 7 && mouseX < s.x + 7) {
+
+						let w = new WallVert(s);
+						walls.push(w);
+						dispatched = true;
+					}
+				}
+			}
+		}
+	}
+
+	return dispatched;
 }
 
 
@@ -451,46 +506,7 @@ function mouseReleased() {
 	if (dispatched) return;
 
 	if (gui_mode == 14) {
-		
-
-
-		for (var c=0; c<columns; c++) {
-			for (var r=0; r<columns; r++) {
-				if (squares[c][r].enabled) {
-					let s = squares[c][r];
-					if (!s.top) {
-						if (mouseY > s.y - 7 && mouseY < s.y + 7 &&
-							mouseX > s.x && mouseX < s.x + s.size) {
-
-							//fill(255, 204, 0, 127);
-							//stroke(255, 204, 0);
-
-							//rect(s.x, s.y - 3, s.size, 6);
-
-							let removed = false;
-							for (let zz=0; zz<walls.length; zz++) {
-								if (walls[zz].parent == s) {
-									walls.splice(zz, 1);
-									removed = true;
-								}
-							}
-
-							if (!removed) {
-								let w = new Wall(s);
-								walls.push(w);
-
-							}
-							//w.add(mouseX, mouseY);
-
-							dispatched = true;
-							// gui_mode = mode_none;
-						}
-					}
-					
-				}
-			}
-		}
-
+		dispatched = mouseReleased_internal_wall();
 	}
 
 	if (dispatched) return;

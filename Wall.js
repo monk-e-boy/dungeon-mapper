@@ -19,6 +19,11 @@ class Wall {
 		this.enabled = true;
 	}
 
+	is_near(x, y) {
+		return y > this.parent.y - 7 && y < this.parent.y + 7 &&
+			   x > this.parent.x && x < this.parent.x + this.parent.size;
+	}
+
 	display() {
 		this.r.reset();
 		stroke(0,0,0);
@@ -62,6 +67,51 @@ class Wall {
 			line(this.parent.size/2, -y1, this.parent.size, y2);
 		}
 
+		pop();
+
+	}
+}
+
+class WallVert extends Wall {
+
+	is_near(x, y) {
+
+		return y > this.parent.y && y < this.parent.y + this.parent.size &&
+			   x > this.parent.x - 7 && x < this.parent.x + 7;
+	}
+
+	display_line() {
+		if (this.r.next_rand() > 0.5) {
+			// two lines
+			var x1 = (this.r.next_rand() * 3) - 1.5;
+			line(x1, 0, -x1, this.parent.size);
+		} else {
+			var x1 = ((this.r.next_rand() * 10 % 1) - 0.5) * 3;
+			var x2 = ((this.r.next_rand() * 100 % 1) - 0.5) * 3;
+			line(x1, 0, -x1, this.parent.size/2);
+			line(-x1, this.parent.size/2, x2, this.parent.size);
+		}
+	}
+
+	display() {
+		this.r.reset();
+		stroke(0,0,0);
+		strokeWeight(1);
+		push();
+		translate(this.parent.x-3, this.parent.y);
+
+		// white background:
+		fill(255);
+		strokeWeight(0);
+		rect(0, 0, 6, this.parent.size);
+
+		strokeWeight(1);
+		this.display_line();
+		pop();
+
+		push();
+		translate(this.parent.x+3, this.parent.y);
+		this.display_line();
 		pop();
 
 	}
