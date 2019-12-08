@@ -69,6 +69,23 @@ class Wall {
 
 		pop();
 
+		if (this.door) {
+			var y1 = (this.r.next_rand() * 2) - 1;
+			let door_size = this.parent.size/4;
+			push();
+			translate(this.parent.x + this.parent.size/2, this.parent.y-3);
+
+			fill(224, 224, 224);
+			quad(
+				-door_size-y1, +y1,
+				 door_size+y1, -y1,
+				 door_size+y1, 6-y1,
+				-door_size-y1, 6+y1
+			);
+
+			pop();
+		}
+
 	}
 }
 
@@ -113,6 +130,23 @@ class WallVert extends Wall {
 		translate(this.parent.x+3, this.parent.y);
 		this.display_line();
 		pop();
+
+		if (this.door) {
+			var x1 = (this.r.next_rand() * 2) - 1;
+			let door_size = this.parent.size/4;
+			push();
+			translate(this.parent.x-3, this.parent.y + this.parent.size/2);
+
+			fill(224, 224, 224);
+			quad(
+				  x1, -door_size-x1,
+				 -x1,  door_size+x1,
+				6-x1,  door_size+x1,
+				6+x1, -door_size-x1
+			);
+
+			pop();
+		}
 
 	}
 }

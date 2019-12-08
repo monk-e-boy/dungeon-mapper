@@ -88,16 +88,27 @@
 }
 
 .toggle {
-	text-align: center; /* Center-align text */
-  padding: 16px; /* Add some padding */
-  transition: all 0.3s ease; /* Add transition for hover effects */
-  color: white; /* White text color */
+  font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
+  font-size: 12px;
+  text-align: center;
+  padding: 4px;
+  transition: all 0.3s ease;
+  color: black;
+  border-radius: 3px;
+  text-decoration: none;
+  border: 1px solid rgb(134, 134, 134);
 }
 
-.toggle a:hover {
-  background-color: #000; /* Add a hover color */
+.toggle:hover {
+  background-color: #f0f0f0;
+  border: 1px solid #ffcc00;
 }
 
 .toggle-on {
-  background-color: #4CAF50; /* Add an active/current color */
+  background-color: #ffcc00;
+}
+
+.toggle-on:hover {
+  background-color: #ffcc00;
+  border: 1px solid #ffcc00;
 }

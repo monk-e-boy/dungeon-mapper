@@ -25,6 +25,7 @@ let mode_none = 0;
 // line modes:
 let mode_drag = 132;
 let mode_add_points = 131;
+let mode_wall = 14;
 
 let gui_mode = mode_none;
 
@@ -203,7 +204,7 @@ function draw() {
 		walls[i].display();
 	}
 
-	if (gui_mode == 14) {
+	if (gui_mode == mode_wall) {
 		//
 		// draw internal walls - highlight / hover event
 		//
@@ -301,6 +302,14 @@ function mousePressed() {
 	}
 }
 
+/*
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+
+https://p5js.org/reference/#/p5/resizeCanvas
+*/
+
 function mouseDragged() {
 	gui_texts.forEach(function(text) {
 		if (text.active) {
@@ -312,17 +321,22 @@ function mouseDragged() {
 
 
 function mouseReleased_internal_wall() {
-	let dispatched = false;
 
-	let removed = false;
+	let action_performed = false;
 	for (let zz=0; zz<walls.length; zz++) {
 		if (walls[zz].is_near(mouseX, mouseY)) {
-			walls.splice(zz, 1);
-			removed = true;
+			// user clicks, if it is in door mode
+			// then delete it
+			if (walls[zz].door) {
+				walls.splice(zz, 1);
+			} else {
+				walls[zz].door = true;
+			}
+			action_performed = true;
 		}
 	}
 
-	if (removed) return true;
+	if (action_performed) return true;
 
 	for (var c=0; c<columns; c++) {
 		for (var r=0; r<columns; r++) {
@@ -334,7 +348,6 @@ function mouseReleased_internal_wall() {
 
 						let w = new Wall(s);
 						walls.push(w);
-						dispatched = true;
 					}
 				}
 
@@ -344,14 +357,11 @@ function mouseReleased_internal_wall() {
 
 						let w = new WallVert(s);
 						walls.push(w);
-						dispatched = true;
 					}
 				}
 			}
 		}
 	}
-
-	return dispatched;
 }
 
 
@@ -505,8 +515,9 @@ function mouseReleased() {
 
 	if (dispatched) return;
 
-	if (gui_mode == 14) {
-		dispatched = mouseReleased_internal_wall();
+	if (gui_mode == mode_wall) {
+		mouseReleased_internal_wall();
+		dispatched = true;
 	}
 
 	if (dispatched) return;
