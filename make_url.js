@@ -6,7 +6,6 @@ function make_url() {
 	// debug
 
 	let tmp = [];
-
 	for (var c=0; c<columns; c++) {
 		for (var r=0; r<columns; r++) {
 			if (squares[c][r].enabled) {
@@ -16,13 +15,11 @@ function make_url() {
 	}
 
 	let tmp2 = [];
-
 	for (let objs=0; objs<objects.length; objs++) {
 		tmp2.push(objects[objs].save());
 	}
 
 	let tmp3 = [];
-
 	gui_texts.forEach(function(text) {
 		tmp3.push(text.save());
 	});
@@ -32,11 +29,17 @@ function make_url() {
 		tmp4.push(lines[i].save());
 	}
 
+	let tmp5 = [];
+	for (let i=0; i<walls.length; i++) {
+		tmp5.push(walls[i].save());
+	}
+
 	var myString = JSON.stringify({
 		rooms: tmp,
 		objects: tmp2,
 		texts: tmp3,
-		lines: tmp4
+		lines: tmp4,
+		walls: tmp5
 	});
 
 	//var input = "test string";
@@ -85,6 +88,14 @@ function get_data_from_url() {
 	lines = [];
 	for (let i=0; i<data.lines.length; i++) {
 		lines.push(InternalWall.factory(data.lines[i]));
+	}
+	
+	walls = [];
+	for (let i=0; i<data.walls.length; i++) {
+		let d = data.walls[i];
+		walls.push(
+			Wall.factory(d, squares[d.c][d.r])
+		);
 	}
 	
 }
