@@ -8,9 +8,20 @@ class Wall {
 	save() {
 		// return a json representation of this object
 		return {
-			c: this.c,
-			r: this.r
+			c: this.parent.c,
+			r: this.parent.r,
+			d: this.door,
+			t: 0
 		};
+	}
+
+	static factory(data, parent) {
+		let wall = null;
+		if (data.t == 0) wall = new Wall();
+		if (data.t == 1) wall = new WallVert();
+		wall.parent = parent;
+		wall.door = data.d;
+		return wall;
 	}
 
 	load(data) {
@@ -90,6 +101,12 @@ class Wall {
 }
 
 class WallVert extends Wall {
+
+	save() {
+		let s = super.save();
+		s.t = 1;
+		return s;
+	}
 
 	is_near(x, y) {
 

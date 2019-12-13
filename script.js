@@ -29,14 +29,24 @@ let mode_wall = 14;
 
 let gui_mode = mode_none;
 
+function toggle_gui_all_off() {
+	var x = document.getElementsByClassName("toggle");
+	for (var i=0; i < x.length; i++) {
+		x[i].classList.remove("toggle-on");
+	}
+}
+
 function toggle_gui_mode(mode) {
-	if (gui_mode == mode_none) {
+
+	toggle_gui_all_off();
+
+	if (gui_mode != mode) {
 		gui_mode = mode;
+		var element = document.getElementById("toolbar-button-"+mode);
+  		element.classList.toggle("toggle-on");
 	} else {
 		gui_mode = mode_none;
 	}
-	var element = document.getElementById("toolbar-button-"+mode);
-  	element.classList.toggle("toggle-on");
 }
 
 function preload() {
@@ -68,6 +78,8 @@ function setup() {
 	//  https://github.com/zenozeng/p5.js-pdf
 
 }
+
+let rot = 0.0;
 
 function draw() {
 
@@ -154,6 +166,19 @@ function draw() {
 		for (var c=0; c<columns; c++) {
 			for (var r=0; r<columns; r++) {
 				squares[c][r].hover_state(squares[c][r].is_over(mouseX, mouseY));
+
+				/* undo the 
+				let v = createVector(mouseX, mouseY);
+				v.sub(300, 300);
+				v.rotate(-(PI/4 + rot));
+
+				stroke("red");
+				strokeWeight(3);
+				point(v.x, v.y);
+
+
+				squares[c][r].hover_state(squares[c][r].is_over(v.x, v.y));
+				*/
 			}
 		}
 	} else {
@@ -190,6 +215,12 @@ function draw() {
 		}
 	}
 
+/*
+	push();
+	translate(300, 300);
+	rotate(PI/4 + rot);
+	// rot += 0.01;
+*/	
 	// rooms and external walls
 	for (var c=0; c<columns; c++) {
 		for (var r=0; r<columns; r++) {
@@ -199,6 +230,9 @@ function draw() {
 		}
 	}
 
+/*
+	pop();
+*/
 	// internal walls
 	for (let i=0; i<walls.length; i++) {
 		walls[i].display();
@@ -451,7 +485,7 @@ function mouseReleased() {
 	if (gui_mode == 1) {
 		objects.push(new Column(mouseX, mouseY, 16));
 		dispatched = true;
-		gui_mode = 0;
+		//gui_mode = 0;
 	}
 
 	if (dispatched) return;
@@ -459,7 +493,7 @@ function mouseReleased() {
 	if (gui_mode == 2) {
 		objects.push(new Column(mouseX, mouseY, 12));
 		dispatched = true;
-		gui_mode = 0;
+		//gui_mode = 0;
 	}
 
 	if (dispatched) return;
@@ -467,7 +501,7 @@ function mouseReleased() {
 	if (gui_mode == 3) {
 		objects.push(new Scatter(mouseX, mouseY, 12));
 		dispatched = true;
-		gui_mode = 0;
+		//gui_mode = 0;
 	}
 
 	if (dispatched) return;
@@ -593,8 +627,14 @@ function keyPressed() {
 
 		// stop adding points to a curve
 		gui_mode = mode_none;
-		let curve = lines[lines.length-1];
-		curve.editing = false;
+
+		for(let i=0; i<lines.length; i++) {
+			let curve = lines[i];
+			curve.editing = false;
+    	}
+		
+		// tell all toggle buttons to turn off
+		toggle_gui_all_off();
 	}
 
 
