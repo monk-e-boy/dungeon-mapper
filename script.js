@@ -53,6 +53,63 @@ function setup() {
 	get_data_from_url();
 
 	//  https://github.com/zenozeng/p5.js-pdf
+	create_clutter();
+
+}
+
+
+let quads = [];
+let points = [];
+
+function create_clutter() {
+	
+
+	for (let x=15; x<600; x+=15) {
+		for (let y=15; y<600; y+=15) {
+			let x1 = random(-6, 6);
+			let y1 = random(-6, 6);
+			points.push([x+x1, y+y1]);
+		}
+	}
+
+	let pos = 0;
+	for (let p=0; p<points.length-40; p++) {
+
+		// don't quad points that wrap from bottom
+		// to top
+		if (points[p+1][1] > points[p+39][1]) {
+			quads.push(
+				[
+					points[p],
+					points[p+1],
+					points[p+40],
+					points[p+39]
+				]
+			);	
+		}		
+	}
+}
+
+function draw_clutter() {
+
+	stroke(200, 200, 250);
+	for (let p=0; p<quads.length; p++) {
+		quad(
+			quads[p][0][0], quads[p][0][1],
+			quads[p][1][0], quads[p][1][1],
+			quads[p][2][0], quads[p][2][1],
+			quads[p][3][0], quads[p][3][1]
+		);
+	}
+
+	let p = 250;
+	stroke(0);
+	quad(
+		quads[p][0][0], quads[p][0][1],
+		quads[p][1][0], quads[p][1][1],
+		quads[p][2][0], quads[p][2][1],
+		quads[p][3][0], quads[p][3][1]
+	);
 
 }
 
@@ -155,6 +212,7 @@ function draw() {
 	//
 	//
 
+	
 
 	// draw the unimportant stuff first
 	// blank squares
@@ -165,6 +223,8 @@ function draw() {
 			}
 		}
 	}
+
+	draw_clutter();
 
 	// clutter
 	for (var c=0; c<columns; c++) {

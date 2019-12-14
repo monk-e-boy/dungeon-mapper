@@ -416,6 +416,8 @@ class Squarex {
 	display_clutter() {
 		if (!this.enabled) return;
 
+		return;
+
 		stroke(100,100,100);
 		strokeWeight(1);
 
