@@ -15,6 +15,8 @@ let font_LaBelleAurore;
 let objects = [];
 let gui_texts = [];
 let lines = [];
+let walls = [];
+
 // dragging a point in a line:
 let drag_point = null;
 
@@ -23,8 +25,29 @@ let mode_none = 0;
 // line modes:
 let mode_drag = 132;
 let mode_add_points = 131;
+let mode_wall = 14;
 
 let gui_mode = mode_none;
+
+function toggle_gui_all_off() {
+	var x = document.getElementsByClassName("toggle");
+	for (var i=0; i < x.length; i++) {
+		x[i].classList.remove("toggle-on");
+	}
+}
+
+function toggle_gui_mode(mode) {
+
+	toggle_gui_all_off();
+
+	if (gui_mode != mode) {
+		gui_mode = mode;
+		var element = document.getElementById("toolbar-button-"+mode);
+  		element.classList.toggle("toggle-on");
+	} else {
+		gui_mode = mode_none;
+	}
+}
 
 function preload() {
 	// Ensure the .ttf or .otf font stored in the assets directory
@@ -113,6 +136,8 @@ function draw_clutter() {
 
 }
 
+let rot = 0.0;
+
 function draw() {
 
 	if (gui_mode == 11) {
@@ -192,10 +217,25 @@ function draw() {
 		}
 	}
 
+
+
 	if ( !dispatched ) {
 		for (var c=0; c<columns; c++) {
 			for (var r=0; r<columns; r++) {
 				squares[c][r].hover_state(squares[c][r].is_over(mouseX, mouseY));
+
+				/* undo the 
+				let v = createVector(mouseX, mouseY);
+				v.sub(300, 300);
+				v.rotate(-(PI/4 + rot));
+
+				stroke("red");
+				strokeWeight(3);
+				point(v.x, v.y);
+
+
+				squares[c][r].hover_state(squares[c][r].is_over(v.x, v.y));
+				*/
 			}
 		}
 	} else {
@@ -235,11 +275,60 @@ function draw() {
 		}
 	}
 
-	// walls
+/*
+	push();
+	translate(300, 300);
+	rotate(PI/4 + rot);
+	// rot += 0.01;
+*/	
+	// rooms and external walls
 	for (var c=0; c<columns; c++) {
 		for (var r=0; r<columns; r++) {
 			if (squares[c][r].enabled) {
 				squares[c][r].display();
+			}
+		}
+	}
+
+/*
+	pop();
+*/
+	// internal walls
+	for (let i=0; i<walls.length; i++) {
+		walls[i].display();
+	}
+
+	if (gui_mode == mode_wall) {
+		//
+		// draw internal walls - highlight / hover event
+		//
+		for (var c=0; c<columns; c++) {
+			for (var r=0; r<columns; r++) {
+				if (squares[c][r].enabled) {
+					let s = squares[c][r];
+					if (!s.top) {
+						if (mouseY > s.y - 7 && mouseY < s.y + 7 &&
+							mouseX > s.x && mouseX < s.x + s.size) {
+
+							fill(255, 204, 0, 127);
+							stroke(255, 204, 0);
+
+							rect(s.x, s.y - 3, s.size, 6);
+						}
+					}
+
+					if (!s.left) {
+						if (mouseY > s.y && mouseY < s.y + s.size &&
+							mouseX > s.x - 7 && mouseX < s.x + 7) {
+
+							fill(255, 204, 0, 127);
+							stroke(255, 204, 0);
+
+							rect(s.x-3, s.y, 6, s.size);
+						}
+					}
+					
+				}
 			}
 		}
 	}
@@ -307,6 +396,14 @@ function mousePressed() {
 	}
 }
 
+/*
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+
+https://p5js.org/reference/#/p5/resizeCanvas
+*/
+
 function mouseDragged() {
 	gui_texts.forEach(function(text) {
 		if (text.active) {
@@ -314,6 +411,51 @@ function mouseDragged() {
 			text.y = text.active_offset_y + mouseY;
 		}
 	});
+}
+
+
+function mouseReleased_internal_wall() {
+
+	let action_performed = false;
+	for (let zz=0; zz<walls.length; zz++) {
+		if (walls[zz].is_near(mouseX, mouseY)) {
+			// user clicks, if it is in door mode
+			// then delete it
+			if (walls[zz].door) {
+				walls.splice(zz, 1);
+			} else {
+				walls[zz].door = true;
+			}
+			action_performed = true;
+		}
+	}
+
+	if (action_performed) return true;
+
+	for (var c=0; c<columns; c++) {
+		for (var r=0; r<columns; r++) {
+			if (squares[c][r].enabled) {
+				let s = squares[c][r];
+				if (!s.top) {
+					if (mouseY > s.y - 7 && mouseY < s.y + 7 &&
+						mouseX > s.x && mouseX < s.x + s.size) {
+
+						let w = new Wall(s);
+						walls.push(w);
+					}
+				}
+
+				if (!s.left) {
+					if (mouseY > s.y && mouseY < s.y + s.size &&
+						mouseX > s.x - 7 && mouseX < s.x + 7) {
+
+						let w = new WallVert(s);
+						walls.push(w);
+					}
+				}
+			}
+		}
+	}
 }
 
 
@@ -403,7 +545,7 @@ function mouseReleased() {
 	if (gui_mode == 1) {
 		objects.push(new Column(mouseX, mouseY, 16));
 		dispatched = true;
-		gui_mode = 0;
+		//gui_mode = 0;
 	}
 
 	if (dispatched) return;
@@ -411,7 +553,7 @@ function mouseReleased() {
 	if (gui_mode == 2) {
 		objects.push(new Column(mouseX, mouseY, 12));
 		dispatched = true;
-		gui_mode = 0;
+		//gui_mode = 0;
 	}
 
 	if (dispatched) return;
@@ -419,7 +561,7 @@ function mouseReleased() {
 	if (gui_mode == 3) {
 		objects.push(new Scatter(mouseX, mouseY, 12));
 		dispatched = true;
-		gui_mode = 0;
+		//gui_mode = 0;
 	}
 
 	if (dispatched) return;
@@ -463,6 +605,13 @@ function mouseReleased() {
 
 		dispatched = true;
 		gui_mode = mode_add_points;
+	}
+
+	if (dispatched) return;
+
+	if (gui_mode == mode_wall) {
+		mouseReleased_internal_wall();
+		dispatched = true;
 	}
 
 	if (dispatched) return;
@@ -538,8 +687,14 @@ function keyPressed() {
 
 		// stop adding points to a curve
 		gui_mode = mode_none;
-		let curve = lines[lines.length-1];
-		curve.editing = false;
+
+		for(let i=0; i<lines.length; i++) {
+			let curve = lines[i];
+			curve.editing = false;
+    	}
+		
+		// tell all toggle buttons to turn off
+		toggle_gui_all_off();
 	}
 
 

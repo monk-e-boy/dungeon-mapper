@@ -29,15 +29,17 @@
   </head>
   <body>
     Boulder:
-    <a href="javascript:gui_mode=1;">big</a>
-    <a href="javascript:gui_mode=2;">medium</a>
-    <a href="javascript:gui_mode=3;">scatter</a>
+    <a class="toggle" id="toolbar-button-1" href="javascript:toggle_gui_mode(1);">big</a>
+    <a class="toggle" id="toolbar-button-2" href="javascript:toggle_gui_mode(2);">medium</a>
+    <a class="toggle" id="toolbar-button-3" href="javascript:toggle_gui_mode(3);">scatter</a>
     |
     Stairs:
     <a class="arrow" href="javascript:gui_mode=9;">&#8679;</a>
     <a class="arrow" href="javascript:gui_mode=7;">&#8681;</a>
     <a class="arrow" href="javascript:gui_mode=8;">&#8678;</a>
     <a class="arrow" href="javascript:gui_mode=10;">&#8680;</a>
+    |
+    <a class="toggle" id="toolbar-button-14" href="javascript:toggle_gui_mode(mode_wall);">Wall</a>
     |
     <a href="javascript:gui_mode=13;">Line</a>
     |
@@ -156,6 +158,7 @@
     <script src="CurvePoint.js"></script>
     <script src="Button.js"></script>
     <script src="curve.js"></script>
+    <script src="Wall.js"></script>
     <script src="Rand.js"></script>
     <script src="gui.js"></script>
     <script src="text.js"></script>
