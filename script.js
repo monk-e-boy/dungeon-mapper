@@ -87,15 +87,18 @@ let points = [];
 function create_clutter() {
 	
 
-	for (let x=15; x<600; x+=15) {
-		for (let y=15; y<600; y+=15) {
-			let x1 = random(-6, 6);
-			let y1 = random(-6, 6);
+	for (let x=60; x<600; x+=60) {
+		for (let y=60; y<600; y+=60) {
+			let x1 = random(-22, 22);  // previously 6
+			let y1 = random(-22, 22);
 			points.push([x+x1, y+y1]);
 		}
 	}
 
 	let pos = 0;
+	let top = 600 / 10;
+
+	/*
 	for (let p=0; p<points.length-40; p++) {
 
 		// don't quad points that wrap from bottom
@@ -107,6 +110,23 @@ function create_clutter() {
 					points[p+1],
 					points[p+40],
 					points[p+39]
+				]
+			);	
+		}		
+	}
+	*/
+
+	for (let p=0; p<points.length-10; p++) {
+
+		// don't quad points that wrap from bottom
+		// to top
+		if (points[p+1][1] > points[p+9][1]) {
+			quads.push(
+				[
+					points[p],
+					points[p+1],
+					points[p+10],
+					points[p+9]
 				]
 			);	
 		}		
@@ -125,7 +145,7 @@ function draw_clutter() {
 		);
 	}
 
-	let p = 250;
+	let p = 25;
 	stroke(0);
 	quad(
 		quads[p][0][0], quads[p][0][1],
@@ -134,11 +154,103 @@ function draw_clutter() {
 		quads[p][3][0], quads[p][3][1]
 	);
 
+	//let v1 = 
+
+	stroke(255, 0, 0);
+	line(quads[p][0][0], quads[p][0][1], quads[p][1][0], quads[p][1][1]);
+	line(quads[p][3][0], quads[p][3][1], quads[p][2][0], quads[p][2][1]);
+
+	stroke(0, 0, 255);
+	strokeWeight(3);
+	point(quads[p][0][0], quads[p][0][1]);
+	point(quads[p][3][0], quads[p][3][1]);
+
+	for (let p=0; p<quads.length; p++) {
+
+		let style = random([0,1,2]);
+		//style = 2;
+		let lines = style == 0 ? random(4,6) : random(5, 8);
+		if (random() > 0.5) {
+			linez(
+				// line 1
+				quads[p][0][0],
+				quads[p][0][1],
+				quads[p][3][0],
+				quads[p][3][1],
+				// line 2
+				quads[p][1][0],
+				quads[p][1][1],
+				quads[p][2][0],
+				quads[p][2][1],
+				// count
+				lines,
+				style
+				
+			);			
+		} else {
+
+			linez(
+				// line 1
+				quads[p][0][0],
+				quads[p][0][1],
+				quads[p][1][0],
+				quads[p][1][1],
+				// line 2
+				quads[p][3][0],
+				quads[p][3][1],
+				quads[p][2][0],
+				quads[p][2][1],
+				// count
+				lines,
+				style
+			);
+		}
+		// break;
+	}
+}
+
+// draw n lines between two lines
+function linez(
+	x1, y1, x2, y2,	// <-- line 1
+	x3, y3, x4, y4,	// <-- line 2
+	count,
+	easing			// 0 linear, 1 eased
+	) {
+	
+	let dx1 = (x2 - x1) / count;
+	let dy1 = (y2 - y1) / count;
+
+	let dx2 = (x4 - x3) / count;
+	let dy2 = (y4 - y3) / count;
+
+	strokeWeight(1);
+	stroke(0);
+
+	for (let c=0; c<=count; c++) {
+		// linear = c
+		// 1 - x^2
+
+		let pos = c;
+		if (easing==1)
+			pos = (1 - Math.pow(c/count, 2)) * count;
+
+		if (easing==2)
+			pos = (1 - Math.pow(1-c/count, 2)) * count;
+
+		line(
+			x1 + dx1*pos,
+			y1 + dy1*pos,
+			x3 + dx2*pos,
+			y3 + dy2*pos
+		);	
+	}
 }
 
 let rot = 0.0;
 
 function draw() {
+
+	randomSeed(99);
 
 	if (gui_mode == 11) {
 		gui_mode = 0;
