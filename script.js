@@ -264,7 +264,7 @@ function draw() {
 		}
 	}
 
-	draw_clutter();
+	//draw_clutter();
 
 	// clutter
 	for (var c=0; c<columns; c++) {
