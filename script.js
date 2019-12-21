@@ -77,16 +77,29 @@ function setup() {
 	get_data_from_url();
 
 	//  https://github.com/zenozeng/p5.js-pdf
-	//create_clutter();
+	create_clutter_dots();
 
 }
+
+
+
 
 
 let quads = [];
 let points = [];
 
 
-function create_clutter() {
+function create_clutter_squares() {
+
+	var baseX = 2;
+	var baseY = 3;
+
+	for (i = 0; i < 200; i++) {
+        point(halton(i, baseX)*600, halton(i, baseY)*600);
+    }
+
+    return;
+
 	let grid_size = 60;
 	let rnd = grid_size / 3;
 
@@ -136,8 +149,24 @@ function create_clutter() {
 	}
 }
 
+// https://en.wikipedia.org/wiki/Delaunay_triangulation
+// https://gist.github.com/bpeck/1889735
+// https://github.com/ironwallaby/delaunay/blob/master/delaunay.js
 
-function draw_clutter() {
+// https://gist.github.com/bpeck/1889735
+function halton(index, base) {
+	var result = 0;
+	var f = 1 / base;
+	var i = index;
+	while(i > 0) {
+		result = result + f * (i % base);
+		i = Math.floor(i / base);
+		f = f / base;
+	}
+	return result;
+};
+
+function draw_clutter_old() {
 
 	stroke(200, 200, 250);
 	for (let p=0; p<quads.length; p++) {
@@ -381,8 +410,8 @@ function draw() {
 		}
 	}
 
-	//draw_clutter();
-
+	draw_clutter();
+/**/
 	// clutter
 	for (var c=0; c<columns; c++) {
 		for (var r=0; r<columns; r++) {
@@ -391,6 +420,7 @@ function draw() {
 			}
 		}
 	}
+
 
 /*
 	push();

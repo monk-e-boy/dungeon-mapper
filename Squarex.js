@@ -412,19 +412,63 @@ class Squarex {
 		pop();
 	}
 
+	display_clutter_whimsy(side) {
+		let v1 = createVector(this.x + this.size/2, this.y);
+		let v2 = createVector(this.next_rand_between(2.2, 2.6), 0);
+		let a = -HALF_PI + this.next_rand_between(PI * 0.2, PI * -0.2);
+		v2.rotate(a);
+		let angle = 0.04 * (this.next_rand() > 0.5 ? -1.0 : 1.0);
+		let delta = 1.15;
+
+		let tmp = null;
+		let tmp_pos = Math.floor(this.next_rand_between(5, 12));
+
+		for (let i=0; i<25; i++) {
+			line(v1.x, v1.y, v1.x+v2.x, v1.y+v2.y);
+			v1.add(v2);		
+
+			let h = v2.heading();
+			v2.rotate(angle);
+			angle *= delta;
+
+			if (i==tmp_pos) tmp = v1.copy();
+			//v2.rotate(v2.heading());
+		}
+
+		v1 = createVector(tmp.x, tmp.y);
+		v2 = createVector(2.4, 0);
+		v2.rotate(tmp.heading()- PI*0.75);
+		angle = -0.06 * (this.next_rand() > 0.5 ? -1.0 : 1.0);
+		delta = 1.15;
+
+
+		for (let i=0; i<20; i++) {
+			line(v1.x, v1.y, v1.x+v2.x, v1.y+v2.y);
+			v1.add(v2);		
+
+			let h = v2.heading();
+			v2.rotate(angle);
+			angle *= delta;
+		}
+
+
+	}
+
 
 	display_clutter() {
 		if (!this.enabled) return;
-
-		return;
 
 		stroke(100,100,100);
 		strokeWeight(1);
 
 		this.jitter_pos = 10;
 
+//		if (this.top && this.next_rand() < 0.1)
 		if (this.top)
-			this.display_clutter_random(TOP);
+			this.display_clutter_whimsy(TOP);
+
+//		if (this.top)
+//			this.display_clutter_random(TOP);
 
 		if (this.bottom)
 			this.display_clutter_random(BOTTOM);
