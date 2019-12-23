@@ -60,10 +60,10 @@ class Triangle {
 		strokeWeight(0);
 		fill(255);
 		triangle(
-				this.x1, this.y1,
-				this.x2, this.y2,
-				this.x3, this.y3
-			);
+			this.x1, this.y1,
+			this.x2, this.y2,
+			this.x3, this.y3
+		);
 
 		stroke(100);
 		strokeWeight(1);
@@ -75,39 +75,6 @@ class Triangle {
 			);
 		}
 
-		stroke(50,30,255);
-		strokeWeight(3);
-
-		for (let i=0; i<dots2.length; i++) {
-			//point(dots2[i][0], dots2[i][1]);
-		}
-		
-		for (let i=0; i<dots3.length; i++) {
-			point(dots3[i][0], dots3[i][1]);
-			point(dots3[i][0]+100, dots3[i][1]);
-		}
-
-		const delaunay = Delaunator.from(dots4);
-		let tmp = delaunay.triangles;
-		// [623, 636, 619,  636, 444, 619, ...]
-
-		stroke(255,30,255);
-		strokeWeight(1);
-
-		function xxxx(i, tri) {
-			triangle(
-				tri[0][0], tri[0][1],
-				tri[1][0], tri[1][1],
-				tri[2][0], tri[2][1]
-			);
-		}
-
-		forEachTriangle(dots4, delaunay, xxxx)
-		for (let t=0; t<delaunay.triangles.length; t++) {
-			let e = edgesOfTriangle(t);
-
-		}
-
 	}
 
 	hatch() {
@@ -115,15 +82,33 @@ class Triangle {
 		if (random() > 0.5) this.rotate();
 		if (random() > 0.5) this.rotate();
 
+		//
+		// TODO TODO!!
+		// measure the triangle and put lines in
+		// that are all similary distance apart
+		//
+
+		let r = new Rand();
+
 		let v1 = createVector(this.x2-this.x1, this.y2-this.y1);
 		let v2 = createVector(this.x3-this.x1, this.y3-this.y1);
 
 		let m1 = v1.mag();
 		let m2 = v2.mag();
+		
+		// TODO: make this better:
 		let c = 0.33;
+
+		// How much the lines fan (are not parallel)
+		let fan1 = r.next_rand_between(5, 20) / 100;
+		let fan2 = 1 - (2*fan1);
+
 		for (let i=c; i<1; i+=c) {
-			v1.setMag(m1 * i + (random() * 1.5) - 0.75);
-			v2.setMag(m2 * i);
+			// how much the lines wander up and down
+			// the vector
+			let jitter = r.next_rand_between(-3, 3);
+			v1.setMag((m1 * i) + jitter);
+			v2.setMag(fan1*m2 + ((m2 * i) * fan2) - jitter);
 			this.lines.push([
 				this.x1 + v1.x, this.y1 + v1.y,
 				this.x1 + v2.x, this.y1 + v2.y
@@ -151,8 +136,33 @@ let triangles = [];
 let dots2 = [];
 let dots3 = [];
 let dots4 = [];
+let d_triangles = [];
+
+function draw_clutter() {
+
+	stroke(139, 235, 65);
+	strokeWeight(3);
+	for (let p=0; p<attractors.length; p++) {
+		point(attractors[p][0], attractors[p][1]);
+	}
+
+	for (let p=0; p<triangles.length; p++) {
+		triangles[p].draw();
+	}
+
+	stroke(50,30,255);
+	strokeWeight(3);
+		
+	for (let i=0; i<dots3.length; i++) {
+		point(dots3[i][0], dots3[i][1]);
+	}
+
+	for (let p=0; p<d_triangles.length; p++) {
+		d_triangles[p].draw();
+	}
 
 
+}
 
 function create_clutter_dots() {
 	// TO DO: https://www.youtube.com/watch?v=1B7YUp5Bvtk
@@ -247,8 +257,7 @@ function create_clutter_dots() {
 	}
 
 	for (let i=1; i<30; i++) {
-		dots3.push([240+ halton(i, baseX)*100, 100+halton(i, baseY)*100]);
-		dots4.push([340+ halton(i, baseX)*100, 100+halton(i, baseY)*100]);
+		dots3.push([240+ halton(i, baseX)*150, 100+halton(i, baseY)*150]);
 	}
 
 
@@ -262,6 +271,23 @@ function create_clutter_dots() {
 			)
 		);
 	}
+
+
+	for (let i=1; i<15; i++) {
+		dots4.push([200+ halton(i, baseX)*150, 340+halton(i, baseY)*150]);
+	}
+
+	const delaunay = Delaunator.from(dots4);
+
+	function xxxx(i, tri) {
+		d_triangles.push(new Triangle(
+			tri[0][0], tri[0][1],
+			tri[1][0], tri[1][1],
+			tri[2][0], tri[2][1]
+		));
+	}
+
+	forEachTriangle(dots4, delaunay, xxxx);
 }
 
 function closest3(x, y) {
@@ -331,16 +357,3 @@ function halton(index, base) {
 	return result;
 };
 
-function draw_clutter() {
-
-	stroke(139, 235, 65);
-	strokeWeight(3);
-	for (let p=0; p<attractors.length; p++) {
-		point(attractors[p][0], attractors[p][1]);
-	}
-
-	for (let p=0; p<triangles.length; p++) {
-		triangles[p].draw();
-	}
-
-}
