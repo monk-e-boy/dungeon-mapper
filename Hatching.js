@@ -35,8 +35,8 @@ class Triangle {
 
 	draw() {
 
-//		let debug = false;
-		let debug = true;
+		let debug = false;
+//		let debug = true;
 		if(debug) {
 			stroke(200,200,200);
 			strokeWeight(1);
@@ -55,6 +55,15 @@ class Triangle {
 			point(this.x2, this.y2);
 			point(this.x3, this.y3);
 		}
+
+		stroke(255);
+		strokeWeight(0);
+		fill(255);
+		triangle(
+				this.x1, this.y1,
+				this.x2, this.y2,
+				this.x3, this.y3
+			);
 
 		stroke(100);
 		strokeWeight(1);

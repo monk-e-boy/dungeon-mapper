@@ -464,11 +464,11 @@ class Squarex {
 		this.jitter_pos = 10;
 
 //		if (this.top && this.next_rand() < 0.1)
-		if (this.top)
-			this.display_clutter_whimsy(TOP);
-
 //		if (this.top)
-//			this.display_clutter_random(TOP);
+//			this.display_clutter_whimsy(TOP);
+
+		if (this.top)
+			this.display_clutter_random(TOP);
 
 		if (this.bottom)
 			this.display_clutter_random(BOTTOM);
