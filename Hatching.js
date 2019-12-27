@@ -92,23 +92,55 @@ class Triangle {
 
 		let v1 = createVector(this.x2-this.x1, this.y2-this.y1);
 		let v2 = createVector(this.x3-this.x1, this.y3-this.y1);
+		let v3 = createVector(this.x3-this.x2, this.y3-this.y2);
 
 		let m1 = v1.mag();
 		let m2 = v2.mag();
-		
+		let m3 = v3.mag();
+
+		// TODO: choose the smallest for our base (short
+		// hatches are pretty)
+		let base = m3; // <<-- fix this
+
 		// TODO: make this better:
-		let c = 0.33;
+		// get area of triangle (Herons formula):
+		let semiperimeter = (m1 + m2 + m3) / 2;
+		let area = Math.sqrt(
+			semiperimeter *
+			(semiperimeter-m1) *
+			(semiperimeter-m2) *
+			(semiperimeter-m3)
+		);
+		let height = (2 * area) / base;
+		
 
 		// How much the lines fan (are not parallel)
 		let fan1 = r.next_rand_between(5, 20) / 100;
 		let fan2 = 1 - (2*fan1);
 
+		// Draw a ling approx every 5px to
+		// match the old hatching
+		let c = 1 / (height / r.next_rand_between(4.9, 7.5));
 		for (let i=c; i<1; i+=c) {
 			// how much the lines wander up and down
-			// the vector
-			let jitter = r.next_rand_between(-3, 3);
+			// the vector:
+			//       /\
+			//      /  \
+			//     /    \
+			//    +------+
+			//   /        \
+			//  /          \
+			// v1          v2
+			//
+			// change the MAG of v1 to retreat back to
+			// the + position (same with v2) then use
+			// v1.x, v1.y as start pos, and v2.x, v2.y
+			// as end of line
+			//
+			let jitter = 0;// r.next_rand_between(-3, 3);
 			v1.setMag((m1 * i) + jitter);
 			v2.setMag(fan1*m2 + ((m2 * i) * fan2) - jitter);
+
 			this.lines.push([
 				this.x1 + v1.x, this.y1 + v1.y,
 				this.x1 + v2.x, this.y1 + v2.y
@@ -231,7 +263,7 @@ function create_clutter_dots() {
 	}
 */
 
-	for (let i=1; i<30; i++) {
+	for (let i=1; i<40; i++) {
 		dots2.push([100+ halton(i, baseX)*100, 100+halton(i, baseY)*100]);
 	}
 
@@ -273,7 +305,7 @@ function create_clutter_dots() {
 	}
 
 
-	for (let i=1; i<15; i++) {
+	for (let i=1; i<45; i++) {
 		dots4.push([200+ halton(i, baseX)*150, 340+halton(i, baseY)*150]);
 	}
 
@@ -288,6 +320,18 @@ function create_clutter_dots() {
 	}
 
 	forEachTriangle(dots4, delaunay, xxxx);
+
+	d_triangles.push(new Triangle(
+		410, 380,
+		390, 400,
+		430, 400
+	));
+
+	d_triangles.push(new Triangle(
+		460, 380,
+		440, 400,
+		480, 400
+	));
 }
 
 function closest3(x, y) {
