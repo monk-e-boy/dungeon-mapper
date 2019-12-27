@@ -20,6 +20,8 @@ class Squarex {
 
 		this.jitter = random();
 		this.jitter_pos = 10;
+
+		this.listener = false;
 	}
 
 	save() {
@@ -69,6 +71,23 @@ class Squarex {
 		} else {
 			this.enabled = !this.enabled;
 			this.door = false;
+		}
+
+		if (this.enabled && this.listener) {
+			// TODO: make listener a list:
+			this.listener.enable_hatches([
+				[this.x, this.y, this.x+this.size, this.y],
+				[this.x, this.y, this.x, this.y+this.size],
+				[this.x+this.size, this.y, this.x+this.size, this.y+this.size],
+				[this.x, this.y+this.size, this.x+this.size, this.y+this.size],
+				// funky lines:
+				// up
+				[this.x+this.size/2, this.y, this.x+this.size/2, this.y-10],
+				[this.x+this.size/2, this.y-15, this.x+this.size/2, this.y-20],
+				[this.x+this.size/2, this.y-25, this.x+this.size/2, this.y-30],
+			]);
+
+
 		}
 	}
 

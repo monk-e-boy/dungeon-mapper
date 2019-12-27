@@ -20,6 +20,47 @@ function forEachTriangle(points, delaunay, callback) {
     }
 }
 
+class HatchThis {
+	constructor(x, y) {
+		this.x = x;
+		this.y = y;
+		// flag to monitor if the hatching
+		// algorithm has visted this item yet
+		this.visited = false;
+	}
+}
+
+class HatchListener {
+	constructor() {
+		// TODO: put list of triangles here?
+		this.lines = [];
+		this.pos = 0;
+	}
+
+	// takes a list of lines, hatches
+	// under those lines are enabled
+	enable_hatches(lines) {
+		this.lines.push(...lines);
+		this.pos = 0;
+
+		// TODO: move this into script->draw()
+		this.update();
+	}
+
+	update() {
+		for (let i=0; i<this.lines.length; i++) {
+
+			for (let p=0; p<d_triangles.length; p++) {
+				if (d_triangles[p].is_over(this.lines[i])) {
+					d_triangles[p].visible = true;
+				}
+			}
+		}
+	}
+
+
+}
+
 class Triangle {
 	constructor(x1, y1, x2, y2, x3, y3) {
 		this.x1 = x1;
@@ -31,9 +72,54 @@ class Triangle {
 
 		this.lines = [];
 		this.hatch();
+
+		this.visible = false;
+	}
+
+	// http://jsfiddle.net/PerroAZUL/zdaY8/1/
+	ptInTriangle(p, p0, p1, p2) {
+		var A = 1/2 * (-p1.y * p2.x + p0.y * (-p1.x + p2.x) + p0.x * (p1.y - p2.y) + p1.x * p2.y);
+		var sign = A < 0 ? -1 : 1;
+		var s = (p0.y * p2.x - p0.x * p2.y + (p2.y - p0.y) * p.x + (p0.x - p2.x) * p.y) * sign;
+		var t = (p0.x * p1.y - p0.y * p1.x + (p0.y - p1.y) * p.x + (p1.x - p0.x) * p.y) * sign;
+
+		return s > 0 && t > 0 && (s + t) < 2 * A * sign;
+	}
+
+	is_over(line) {
+		let x1 = line[0];
+		let y1 = line[1];
+		let x2 = line[2];
+		let y2 = line[3];
+
+		if (
+			this.ptInTriangle(
+				{x: x1, y: y1},
+				{x: this.x1, y: this.y1},
+				{x: this.x2, y: this.y2},
+				{x: this.x3, y: this.y3}
+				)
+			) {
+			return true;
+		}
+
+		if (
+			this.ptInTriangle(
+				{x: x2, y: y2},
+				{x: this.x1, y: this.y1},
+				{x: this.x2, y: this.y2},
+				{x: this.x3, y: this.y3}
+				)
+			) {
+			return true;
+		}
+
+		return false;
 	}
 
 	draw() {
+
+		if (!this.visible) return;
 
 		let debug = false;
 //		let debug = true;
@@ -121,14 +207,15 @@ class Triangle {
 		// Draw a ling approx every 5px to
 		// match the old hatching
 		let c = 1 / (height / r.next_rand_between(4.9, 7.5));
+		c *= 0.95;
 		for (let i=c; i<1; i+=c) {
 			// how much the lines wander up and down
-			// the vector:
+			// the left and right vectors:
 			//       /\
 			//      /  \
 			//     /    \
-			//    +------+
-			//   /        \
+			//    +------+   <--- this is the line / hatch we are
+			//   /        \       calculating
 			//  /          \
 			// v1          v2
 			//
@@ -169,6 +256,12 @@ let dots2 = [];
 let dots3 = [];
 let dots4 = [];
 let d_triangles = [];
+
+// lines that will enable hatching
+let hatch_this = [];
+// TODO: maybe fix the name of this?
+// TODO: move this into script->setup
+let hatch_listener = new HatchListener();
 
 function draw_clutter() {
 

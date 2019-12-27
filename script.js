@@ -74,6 +74,8 @@ function setup() {
 	rooms = new Rooms(columns, columns, size);
 	_object = new Objects();
 
+	rooms.add_event_listener("show", hatch_listener);
+
 	get_data_from_url();
 
 	//  https://github.com/zenozeng/p5.js-pdf
