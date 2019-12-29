@@ -1,3 +1,66 @@
+class HandDrawnGraphics {
+	constructor() {
+		this.r = new Rand();
+	}
+
+	// returns an array of lines
+	// that look hand drawn
+	// some ideas from here (we don't use curves)
+	//   http://stevehanov.ca/blog/index.php?id=33
+	//
+	// this is interesting:
+	//   https://github.com/pshihn/rough
+	//
+	line(x1, y1, x2, y2) {
+
+		let lines = [];
+
+		let v = createVector(
+			x2 - x1,
+			y2 - y1,
+			);
+
+		if (true || v.mag() > 8) {
+
+			let mid = v.copy();
+			mid.mult(0.5);
+			let mid2 = v.copy();
+			mid2.mult(0.5);
+			mid2.add(mid);
+
+			mid.rotate(this.r.next_rand_between(0.1, -0.1));// + );
+
+			let start = v.copy();
+			start.normalize();		// 1px length
+			// 3px in 'wrong' direction - sketchy start
+			start.mult(this.r.next_rand_between(-4, 3));
+			start.rotate(start.heading() + this.r.next_rand_between(-1, 1));
+
+			let end = start.copy();
+			end.rotate(end.heading());	// flip it 180
+			mid2.add(end);
+
+			lines.push([
+				x1 + start.x,
+				y1 + start.y,
+				x1 + mid.x,
+				y1 + mid.y,
+			]);
+
+			lines.push([
+				x1 + mid.x,
+				y1 + mid.y,
+				x1 + mid2.x,
+				y1 + mid2.y,
+			]);
+		}
+
+		return lines;
+	}
+}
+
+byHand = null;// see script new HandDrawnGraphics();
+
 
 //
 // The big list of things I googled and investigated:
@@ -33,14 +96,28 @@ class HatchThis {
 class HatchListener {
 	constructor() {
 		// TODO: put list of triangles here?
-		this.lines = [];
+		this.points = [];
 		this.pos = 0;
 	}
 
 	// takes a list of lines, hatches
 	// under those lines are enabled
-	enable_hatches(lines) {
-		this.lines.push(...lines);
+	enable_hatches(points) {
+		this.points.push(...points);
+		this.pos = 0;
+
+		// TODO: move this into script->draw()
+		this.update();
+	}
+
+	disable_hatches(points) {		
+		const filteredItems = this.points.filter(item => !points.includes(item));
+
+		for (let p=0; p<d_triangles.length; p++) {
+			d_triangles[p].visible = false;
+		}
+
+		this.points = filteredItems;
 		this.pos = 0;
 
 		// TODO: move this into script->draw()
@@ -48,10 +125,10 @@ class HatchListener {
 	}
 
 	update() {
-		for (let i=0; i<this.lines.length; i++) {
+		for (let i=0; i<this.points.length; i++) {
 
 			for (let p=0; p<d_triangles.length; p++) {
-				if (d_triangles[p].is_over(this.lines[i])) {
+				if (d_triangles[p].is_over(this.points[i])) {
 					d_triangles[p].visible = true;
 				}
 			}
@@ -86,11 +163,9 @@ class Triangle {
 		return s > 0 && t > 0 && (s + t) < 2 * A * sign;
 	}
 
-	is_over(line) {
-		let x1 = line[0];
-		let y1 = line[1];
-		let x2 = line[2];
-		let y2 = line[3];
+	is_over(point) {
+		let x1 = point[0];
+		let y1 = point[1];
 
 		if (
 			this.ptInTriangle(
@@ -103,23 +178,10 @@ class Triangle {
 			return true;
 		}
 
-		if (
-			this.ptInTriangle(
-				{x: x2, y: y2},
-				{x: this.x1, y: this.y1},
-				{x: this.x2, y: this.y2},
-				{x: this.x3, y: this.y3}
-				)
-			) {
-			return true;
-		}
-
 		return false;
 	}
 
 	draw() {
-
-		if (!this.visible) return;
 
 		let debug = false;
 //		let debug = true;
@@ -142,23 +204,28 @@ class Triangle {
 			point(this.x3, this.y3);
 		}
 
-		stroke(255);
-		strokeWeight(0);
-		fill(255);
-		triangle(
-			this.x1, this.y1,
-			this.x2, this.y2,
-			this.x3, this.y3
-		);
+		if (!this.visible) return;
+
+		if (false) {
+			// fill background with white
+			// don't think we need this as
+			// triangles don't overlap
+			stroke(255);
+			strokeWeight(0);
+			fill(255);
+			triangle(
+				this.x1, this.y1,
+				this.x2, this.y2,
+				this.x3, this.y3
+			);
+		}
+		
 
 		stroke(100);
 		strokeWeight(1);
 
 		for (let i=0; i<this.lines.length; i++) {
-			line(
-				this.lines[i][0], this.lines[i][1],
-				this.lines[i][2], this.lines[i][3]
-			);
+			line(this.lines[i][0], this.lines[i][1], this.lines[i][2], this.lines[i][3]);
 		}
 
 	}
@@ -228,10 +295,17 @@ class Triangle {
 			v1.setMag((m1 * i) + jitter);
 			v2.setMag(fan1*m2 + ((m2 * i) * fan2) - jitter);
 
-			this.lines.push([
-				this.x1 + v1.x, this.y1 + v1.y,
-				this.x1 + v2.x, this.y1 + v2.y
-			]);
+		//	this.lines.push([
+		//		this.x1 + v1.x, this.y1 + v1.y,
+		//		this.x1 + v2.x, this.y1 + v2.y
+		//	]);
+
+			this.lines.push(
+				...byHand.line(
+					this.x1 + v1.x, this.y1 + v1.y,
+					this.x1 + v2.x, this.y1 + v2.y
+				)
+			);
 		}
 
 	}
@@ -398,8 +472,8 @@ function create_clutter_dots() {
 	}
 
 
-	for (let i=1; i<45; i++) {
-		dots4.push([200+ halton(i, baseX)*150, 340+halton(i, baseY)*150]);
+	for (let i=1; i<234; i++) {
+		dots4.push([halton(i, baseX)*600, 340+halton(i, baseY)*(600-340)]);
 	}
 
 	const delaunay = Delaunator.from(dots4);
@@ -425,6 +499,13 @@ function create_clutter_dots() {
 		440, 400,
 		480, 400
 	));
+
+	let t = new Triangle(
+		50, 10,
+		0, 60,
+		100, 60
+	);
+	d_triangles.push(t);
 }
 
 function closest3(x, y) {

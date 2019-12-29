@@ -71,6 +71,7 @@ function setup() {
 
 	var size = 30;
 
+	byHand = new HandDrawnGraphics();
 	rooms = new Rooms(columns, columns, size);
 	_object = new Objects();
 
