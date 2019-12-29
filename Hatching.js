@@ -295,11 +295,6 @@ class Triangle {
 			v1.setMag((m1 * i) + jitter);
 			v2.setMag(fan1*m2 + ((m2 * i) * fan2) - jitter);
 
-		//	this.lines.push([
-		//		this.x1 + v1.x, this.y1 + v1.y,
-		//		this.x1 + v2.x, this.y1 + v2.y
-		//	]);
-
 			this.lines.push(
 				...byHand.line(
 					this.x1 + v1.x, this.y1 + v1.y,
@@ -362,7 +357,7 @@ function create_clutter_dots() {
 	forEachTriangle(dots, delaunay, xxxx);
 
 }
-
+/*
 function closest3(x, y) {
 
 	// 600 px is a big enough non squared distance
@@ -388,7 +383,7 @@ function closest3(x, y) {
 
 	return [pos, pos2];
 }
-
+*/
 function closest(x, y) {
 
 	// 600 px is a big enough non squared distance
