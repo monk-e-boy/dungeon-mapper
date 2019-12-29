@@ -357,59 +357,6 @@ function create_clutter_dots() {
 	forEachTriangle(dots, delaunay, xxxx);
 
 }
-/*
-function closest3(x, y) {
-
-	// 600 px is a big enough non squared distance
-	let dist = 600 * 600;
-	let dist2 = dist;
-	let pos = -1;
-	let pos2 = -1;
-
-	for (let p=0; p<dots3.length; p++) {
-		let dx = dots3[p][0]-x;
-		let dy = dots3[p][1]-y;
-		let d = dx*dx + dy*dy;
-		if (d!=0 && d < dist) {
-			pos = p;
-			dist = d;
-		}
-
-		if (d!=0 && d!=dist && d < dist2) {
-			pos2 = p;
-			dist2 = d;
-		}
-	}
-
-	return [pos, pos2];
-}
-*/
-function closest(x, y) {
-
-	// 600 px is a big enough non squared distance
-	let dist = 600 * 600;
-	let dist2 = dist;
-	let pos = -1;
-	let pos2 = -1;
-
-	for (let p=0; p<dots.length; p++) {
-		let dx = dots[p][0]-x;
-		let dy = dots[p][1]-y;
-		let d = dx*dx + dy*dy;
-		if (d!=0 && d < dist) {
-			pos = p;
-			dist = d;
-		}
-
-		if (d!=0 && d!=dist && d < dist2) {
-			pos2 = p;
-			dist2 = d;
-		}
-	}
-
-	return [pos, pos2];
-}
-
 
 
 // https://gist.github.com/bpeck/1889735
