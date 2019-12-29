@@ -26,6 +26,7 @@ let mode_none = 0;
 let mode_drag = 132;
 let mode_add_points = 131;
 let mode_wall = 14;
+let mode_select = 15;
 
 let gui_mode = mode_none;
 
@@ -70,32 +71,53 @@ function setup() {
 
 	var size = 30;
 
+	byHand = new HandDrawnGraphics();
 	rooms = new Rooms(columns, columns, size);
 	_object = new Objects();
+
+	rooms.add_event_listener("show", hatch_listener);
 
 	get_data_from_url();
 
 	//  https://github.com/zenozeng/p5.js-pdf
-	create_clutter();
+	create_clutter_dots();
 
 }
+
+
+
 
 
 let quads = [];
 let points = [];
 
-function create_clutter() {
-	
 
-	for (let x=15; x<600; x+=15) {
-		for (let y=15; y<600; y+=15) {
-			let x1 = random(-6, 6);
-			let y1 = random(-6, 6);
+function create_clutter_squares() {
+
+	var baseX = 2;
+	var baseY = 3;
+
+	for (i = 0; i < 200; i++) {
+        point(halton(i, baseX)*600, halton(i, baseY)*600);
+    }
+
+    return;
+
+	let grid_size = 60;
+	let rnd = grid_size / 3;
+
+	for (let x=grid_size; x<600; x+=grid_size) {
+		for (let y=grid_size; y<600; y+=grid_size) {
+			let x1 = random(-rnd, rnd);  // previously 6
+			let y1 = random(-rnd, rnd);
 			points.push([x+x1, y+y1]);
 		}
 	}
 
 	let pos = 0;
+	let top = 600 / 10;
+
+	/*
 	for (let p=0; p<points.length-40; p++) {
 
 		// don't quad points that wrap from bottom
@@ -111,9 +133,43 @@ function create_clutter() {
 			);	
 		}		
 	}
+	*/
+
+	for (let p=0; p<points.length-10; p++) {
+
+		// don't quad points that wrap from bottom
+		// to top
+		if (points[p+1][1] > points[p+9][1]) {
+			quads.push(
+				[
+					points[p],
+					points[p+1],
+					points[p+10],
+					points[p+9]
+				]
+			);	
+		}		
+	}
 }
 
-function draw_clutter() {
+// https://en.wikipedia.org/wiki/Delaunay_triangulation
+// https://gist.github.com/bpeck/1889735
+// https://github.com/ironwallaby/delaunay/blob/master/delaunay.js
+
+// https://gist.github.com/bpeck/1889735
+function halton(index, base) {
+	var result = 0;
+	var f = 1 / base;
+	var i = index;
+	while(i > 0) {
+		result = result + f * (i % base);
+		i = Math.floor(i / base);
+		f = f / base;
+	}
+	return result;
+};
+
+function draw_clutter_old() {
 
 	stroke(200, 200, 250);
 	for (let p=0; p<quads.length; p++) {
@@ -125,7 +181,8 @@ function draw_clutter() {
 		);
 	}
 
-	let p = 250;
+
+	let p = 25;
 	stroke(0);
 	quad(
 		quads[p][0][0], quads[p][0][1],
@@ -134,11 +191,103 @@ function draw_clutter() {
 		quads[p][3][0], quads[p][3][1]
 	);
 
+	//let v1 = 
+
+	stroke(255, 0, 0);
+	line(quads[p][0][0], quads[p][0][1], quads[p][1][0], quads[p][1][1]);
+	line(quads[p][3][0], quads[p][3][1], quads[p][2][0], quads[p][2][1]);
+
+	stroke(0, 0, 255);
+	strokeWeight(3);
+	point(quads[p][0][0], quads[p][0][1]);
+	point(quads[p][3][0], quads[p][3][1]);
+
+	for (let p=0; p<quads.length; p++) {
+
+		let style = random([0,1,2]);
+		//style = 2;
+		let lines = style == 0 ? random(4,6) : random(5, 8);
+		if (random() > 0.5) {
+			linez(
+				// line 1
+				quads[p][0][0],
+				quads[p][0][1],
+				quads[p][3][0],
+				quads[p][3][1],
+				// line 2
+				quads[p][1][0],
+				quads[p][1][1],
+				quads[p][2][0],
+				quads[p][2][1],
+				// count
+				lines,
+				style
+				
+			);			
+		} else {
+
+			linez(
+				// line 1
+				quads[p][0][0],
+				quads[p][0][1],
+				quads[p][1][0],
+				quads[p][1][1],
+				// line 2
+				quads[p][3][0],
+				quads[p][3][1],
+				quads[p][2][0],
+				quads[p][2][1],
+				// count
+				lines,
+				style
+			);
+		}
+		// break;
+	}
+}
+
+// draw n lines between two lines
+function linez(
+	x1, y1, x2, y2,	// <-- line 1
+	x3, y3, x4, y4,	// <-- line 2
+	count,
+	easing			// 0 linear, 1 eased
+	) {
+	
+	let dx1 = (x2 - x1) / count;
+	let dy1 = (y2 - y1) / count;
+
+	let dx2 = (x4 - x3) / count;
+	let dy2 = (y4 - y3) / count;
+
+	strokeWeight(1);
+	stroke(0);
+
+	for (let c=0; c<=count; c++) {
+		// linear = c
+		// 1 - x^2
+
+		let pos = c;
+		if (easing==1)
+			pos = (1 - Math.pow(c/count, 2)) * count;
+
+		if (easing==2)
+			pos = (1 - Math.pow(1-c/count, 2)) * count;
+
+		line(
+			x1 + dx1*pos,
+			y1 + dy1*pos,
+			x3 + dx2*pos,
+			y3 + dy2*pos
+		);	
+	}
 }
 
 let rot = 0.0;
 
 function draw() {
+
+	// randomSeed(99);
 
 	if (gui_mode == 11) {
 		gui_mode = 0;
@@ -264,7 +413,8 @@ function draw() {
 		}
 	}
 
-	//draw_clutter();
+
+	draw_clutter();
 
 	// clutter
 	for (var c=0; c<columns; c++) {
@@ -274,6 +424,7 @@ function draw() {
 			}
 		}
 	}
+
 
 /*
 	push();
@@ -352,6 +503,22 @@ function draw() {
 		text.display();
 	});
 
+	if (gui_mode == mode_select) {
+		if (select_start_pos.start_x != -1 ) {
+
+			strokeWeight(1);
+			stroke(0, 0, 255, 75);
+			fill(0, 0, 255, 75);
+			rectMode(CORNERS);
+			rect(
+				select_start_pos.start_x,
+				select_start_pos.start_y,
+				select_start_pos.end_x,
+				select_start_pos.end_y
+			);
+		}
+	}
+
 }
 
 function mousePressed() {
@@ -394,7 +561,22 @@ function mousePressed() {
 			}
 		}
 	}
+
+	//
+	// SELECT ITEMS FOR ROTATION
+	//
+	if (!dispatched && gui_mode == mode_select) {
+		select_start_pos.start_x = mouseX;
+		select_start_pos.start_y = mouseY;
+	}
 }
+
+var select_start_pos = {
+	start_x: -1,
+	start_y: 0,
+	end_x: 0,
+	end_y: 0
+};
 
 /*
 function windowResized() {
@@ -411,6 +593,11 @@ function mouseDragged() {
 			text.y = text.active_offset_y + mouseY;
 		}
 	});
+
+	if (gui_mode == mode_select) {
+		select_start_pos.end_x = mouseX;
+		select_start_pos.end_y = mouseY;
+	}
 }
 
 
@@ -464,6 +651,13 @@ function mouseReleased() {
 	if (gui_mode == mode_drag) {
 		// user was dragging internal wall
 		gui_mode = mode_none;
+	}
+
+	if (gui_mode == mode_select) {
+		// user was dragging a selection box
+		gui_mode = mode_none;
+		select_start_pos.start_x = -1;
+		return;
 	}
 
 	// user is clicking to STOP editing text

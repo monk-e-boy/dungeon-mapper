@@ -23,6 +23,16 @@ class Rooms {
 
 	}
 
+	add_event_listener(type, listener) {
+		// we don't care about type - we only fire
+		// one type of event - enabled
+		for (var c=0; c<this.columns; c++) {
+			for (var r=0; r<this.rows; r++) {
+				squares[c][r].listener = listener;
+			}
+		}
+	}
+
 	enable_walls(squares, c, r) {
 
 		// turn borders OFF if the square is enabled

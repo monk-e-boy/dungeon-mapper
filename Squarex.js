@@ -20,6 +20,75 @@ class Squarex {
 
 		this.jitter = random();
 		this.jitter_pos = 10;
+
+		this.listener = false;
+		// remember this so we can turn the
+		// hatches on/off as we see fit
+		this.hatch_list = this.create_hatch_list();
+	}
+
+	create_hatch_list() {
+		let tmp = [
+			[this.x, this.y],				// top left
+			[this.x+this.size, this.y],		// top right
+			[this.x, this.y+this.size],		// bottom left
+			[this.x+this.size, this.y+this.size],	// bottom right
+			// funky lines:
+			// mid top going up
+			[this.x+this.size/2, this.y],
+			[this.x+this.size/2, this.y-10],
+			[this.x+this.size/2, this.y-15],
+			//[this.x+this.size/2, this.y-20],
+			//[this.x+this.size/2, this.y-25],
+			// mid bottom going down
+			[this.x+this.size/2, this.y+this.size],
+			[this.x+this.size/2, this.y+this.size+10],
+			[this.x+this.size/2, this.y+this.size+15],
+			//[this.x+this.size/2, this.y+this.size+20],
+			//[this.x+this.size/2, this.y+this.size+25],
+			// mid left going left
+			[this.x, this.y+this.size/2],
+			[this.x-10, this.y+this.size/2],
+			[this.x-15, this.y+this.size/2],
+			//[this.x-20, this.y+this.size/2],
+			//[this.x-25, this.y+this.size/2],
+			// mid right going right
+			[this.x+this.size, this.y+this.size/2],
+			[this.x+this.size+10, this.y+this.size/2],
+			[this.x+this.size+15, this.y+this.size/2],
+			//[this.x+this.size+20, this.y+this.size/2],
+			//[this.x+this.size+25, this.y+this.size/2],
+			// diagonal top left
+			[this.x-5, this.y-5],
+			// diagonal top right
+			[this.x+this.size+5, this.y-5],
+			// diagonal bottom left
+			[this.x-5, this.y+this.size+5],
+			// diagonal bottom right
+			[this.x+this.size+5, this.y+this.size+5],
+		];
+
+		if (this.next_rand() > 0.8)
+			tmp.push([
+				[this.x+this.size/2, this.y-45]
+			]);
+
+		if (this.next_rand() > 0.8)
+			tmp.push([
+				[this.x+this.size/2, this.y+this.size+45]
+			]);
+
+		if (this.next_rand() > 0.8)
+			tmp.push([
+				[this.x-45, this.y+this.size/2]
+			]);
+
+		if (this.next_rand() > 0.8)
+			tmp.push([
+				[this.x+this.size+45, this.y+this.size/2]
+			]);
+
+		return tmp;
 	}
 
 	save() {
@@ -70,6 +139,17 @@ class Squarex {
 			this.enabled = !this.enabled;
 			this.door = false;
 		}
+
+		if (this.enabled && this.listener) {
+			// TODO: make listener a list:
+			this.listener.enable_hatches(this.hatch_list);
+		}
+
+		if ( !this.enabled && this.listener) {
+			// TODO: make listener a list:
+			this.listener.disable_hatches(this.hatch_list);
+		}
+
 	}
 
 	display_door_wall() {
@@ -412,6 +492,48 @@ class Squarex {
 		pop();
 	}
 
+	display_clutter_whimsy(side) {
+		let v1 = createVector(this.x + this.size/2, this.y);
+		let v2 = createVector(this.next_rand_between(2.2, 2.6), 0);
+		let a = -HALF_PI + this.next_rand_between(PI * 0.2, PI * -0.2);
+		v2.rotate(a);
+		let angle = 0.04 * (this.next_rand() > 0.5 ? -1.0 : 1.0);
+		let delta = 1.15;
+
+		let tmp = null;
+		let tmp_pos = Math.floor(this.next_rand_between(5, 12));
+
+		for (let i=0; i<25; i++) {
+			line(v1.x, v1.y, v1.x+v2.x, v1.y+v2.y);
+			v1.add(v2);		
+
+			let h = v2.heading();
+			v2.rotate(angle);
+			angle *= delta;
+
+			if (i==tmp_pos) tmp = v1.copy();
+			//v2.rotate(v2.heading());
+		}
+
+		v1 = createVector(tmp.x, tmp.y);
+		v2 = createVector(2.4, 0);
+		v2.rotate(tmp.heading()- PI*0.75);
+		angle = -0.06 * (this.next_rand() > 0.5 ? -1.0 : 1.0);
+		delta = 1.15;
+
+
+		for (let i=0; i<20; i++) {
+			line(v1.x, v1.y, v1.x+v2.x, v1.y+v2.y);
+			v1.add(v2);		
+
+			let h = v2.heading();
+			v2.rotate(angle);
+			angle *= delta;
+		}
+
+
+	}
+
 
 	display_clutter() {
 		if (!this.enabled) return;
@@ -422,6 +544,10 @@ class Squarex {
 		strokeWeight(1);
 
 		this.jitter_pos = 10;
+
+//		if (this.top && this.next_rand() < 0.1)
+//		if (this.top)
+//			this.display_clutter_whimsy(TOP);
 
 		if (this.top)
 			this.display_clutter_random(TOP);
