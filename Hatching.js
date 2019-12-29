@@ -323,12 +323,7 @@ class Triangle {
 }
 
 let dots = [];
-let attractors = [];
-let triangles = [];
 
-let dots2 = [];
-let dots3 = [];
-let dots4 = [];
 let d_triangles = [];
 
 // lines that will enable hatching
@@ -339,27 +334,9 @@ let hatch_listener = new HatchListener();
 
 function draw_clutter() {
 
-	stroke(139, 235, 65);
-	strokeWeight(3);
-	for (let p=0; p<attractors.length; p++) {
-		point(attractors[p][0], attractors[p][1]);
-	}
-
-	for (let p=0; p<triangles.length; p++) {
-		triangles[p].draw();
-	}
-
-	stroke(50,30,255);
-	strokeWeight(3);
-		
-	for (let i=0; i<dots3.length; i++) {
-		point(dots3[i][0], dots3[i][1]);
-	}
-
 	for (let p=0; p<d_triangles.length; p++) {
 		d_triangles[p].draw();
 	}
-
 
 }
 
@@ -368,115 +345,11 @@ function create_clutter_dots() {
 	var baseX = 2;
 	var baseY = 3;
 
-//	for (let i=1; i<30; i++) {
-//		dots.push([halton(i, baseX)*600, halton(i, baseY)*600]);
-//	}
-
-	for (let i=0; i<20; i++) {
-		dots.push([100 + i * 30, 300 - i]);
+	for (let i=1; i<600; i++) {
+		dots.push([halton(i, baseX)*660-30, halton(i, baseY)*660-30]);
 	}
 
-	for (let i=0; i<21; i++) {
-		dots.push([100 + i * 30, 320 - i]);
-	}
-
-/*
-	let v1 = createVector(300, 300);
-	let v2 = createVector(14, 0);
-	v2.rotate(TWO_PI * random());
-	let angle = 0.05;
-	let delta = 1.02;
-
-	for (let i=0; i<70; i++) {
-		attractors.push([v1.x, v1.y]);
-		v1.add(v2);		
-
-		let h = v2.heading();
-		v2.rotate(angle);
-		angle *= delta;
-
-		//v2.rotate(v2.heading());
-	}
-*/
-
-	for (let p=0; p<19; p++) {
-		triangles.push(
-			new Triangle(
-				dots[p][0], dots[p][1],
-				dots[p+20][0], dots[p+20][1],
-				dots[p+21][0], dots[p+21][1]
-			)
-		);
-
-		triangles.push(
-			new Triangle(
-				dots[p][0], dots[p][1],
-				dots[p+1][0], dots[p+1][1],
-				dots[p+21][0], dots[p+21][1]
-			)
-		);
-	}
-
-/*
-	for (let p=0; p<dots.length; p++) {
-		let close = closest(dots[p][0], dots[p][1]);
-		triangles.push(
-			new Triangle(
-				dots[p][0], dots[p][1],
-				dots[close[0]][0], dots[close[0]][1],
-				dots[close[1]][0], dots[close[1]][1]
-			)
-		);
-	}
-*/
-
-	for (let i=1; i<40; i++) {
-		dots2.push([100+ halton(i, baseX)*100, 100+halton(i, baseY)*100]);
-	}
-
-	for (let i=0; i<dots2.length; i++) {
-		let x = dots2[i][0];
-		let y = dots2[i][1];
-
-		let v = createVector(15, 0);
-		v.rotate(TWO_PI*random());
-
-		let t = [];
-		t.push(x + v.x, y + v.y);
-		v.rotate(TWO_PI/3);
-		t.push(x + v.x, y + v.y);
-		v.rotate(TWO_PI/3);
-		t.push(x + v.x, y + v.y);
-
-		triangles.push(new Triangle(
-			t[0], t[1],
-			t[2], t[3],
-			t[4], t[5]
-		));
-	}
-
-	for (let i=1; i<30; i++) {
-		dots3.push([240+ halton(i, baseX)*150, 100+halton(i, baseY)*150]);
-	}
-
-
-	for (let p=0; p<dots3.length; p++) {
-		let close = closest3(dots3[p][0], dots3[p][1]);
-		triangles.push(
-			new Triangle(
-				dots3[p][0], dots3[p][1],
-				dots3[close[0]][0], dots3[close[0]][1],
-				dots3[close[1]][0], dots3[close[1]][1]
-			)
-		);
-	}
-
-
-	for (let i=1; i<234; i++) {
-		dots4.push([halton(i, baseX)*600, 340+halton(i, baseY)*(600-340)]);
-	}
-
-	const delaunay = Delaunator.from(dots4);
+	const delaunay = Delaunator.from(dots);
 
 	function xxxx(i, tri) {
 		d_triangles.push(new Triangle(
@@ -486,26 +359,8 @@ function create_clutter_dots() {
 		));
 	}
 
-	forEachTriangle(dots4, delaunay, xxxx);
+	forEachTriangle(dots, delaunay, xxxx);
 
-	d_triangles.push(new Triangle(
-		410, 380,
-		390, 400,
-		430, 400
-	));
-
-	d_triangles.push(new Triangle(
-		460, 380,
-		440, 400,
-		480, 400
-	));
-
-	let t = new Triangle(
-		50, 10,
-		0, 60,
-		100, 60
-	);
-	d_triangles.push(t);
 }
 
 function closest3(x, y) {
