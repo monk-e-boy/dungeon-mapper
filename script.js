@@ -22,6 +22,8 @@ let drag_point = null;
 
 // MODES:
 let mode_none = 0;
+let mode_save_png = 11;
+let mode_save_png_x2 = 16;
 // line modes:
 let mode_drag = 132;
 let mode_add_points = 131;
@@ -84,212 +86,17 @@ function setup() {
 
 }
 
-
-
-
-
-let quads = [];
-let points = [];
-
-
-function create_clutter_squares() {
-
-	var baseX = 2;
-	var baseY = 3;
-
-	for (i = 0; i < 200; i++) {
-        point(halton(i, baseX)*600, halton(i, baseY)*600);
-    }
-
-    return;
-
-	let grid_size = 60;
-	let rnd = grid_size / 3;
-
-	for (let x=grid_size; x<600; x+=grid_size) {
-		for (let y=grid_size; y<600; y+=grid_size) {
-			let x1 = random(-rnd, rnd);  // previously 6
-			let y1 = random(-rnd, rnd);
-			points.push([x+x1, y+y1]);
-		}
-	}
-
-	let pos = 0;
-	let top = 600 / 10;
-
-	/*
-	for (let p=0; p<points.length-40; p++) {
-
-		// don't quad points that wrap from bottom
-		// to top
-		if (points[p+1][1] > points[p+39][1]) {
-			quads.push(
-				[
-					points[p],
-					points[p+1],
-					points[p+40],
-					points[p+39]
-				]
-			);	
-		}		
-	}
-	*/
-
-	for (let p=0; p<points.length-10; p++) {
-
-		// don't quad points that wrap from bottom
-		// to top
-		if (points[p+1][1] > points[p+9][1]) {
-			quads.push(
-				[
-					points[p],
-					points[p+1],
-					points[p+10],
-					points[p+9]
-				]
-			);	
-		}		
-	}
-}
-
-// https://en.wikipedia.org/wiki/Delaunay_triangulation
-// https://gist.github.com/bpeck/1889735
-// https://github.com/ironwallaby/delaunay/blob/master/delaunay.js
-
-// https://gist.github.com/bpeck/1889735
-function halton(index, base) {
-	var result = 0;
-	var f = 1 / base;
-	var i = index;
-	while(i > 0) {
-		result = result + f * (i % base);
-		i = Math.floor(i / base);
-		f = f / base;
-	}
-	return result;
-};
-
-function draw_clutter_old() {
-
-	stroke(200, 200, 250);
-	for (let p=0; p<quads.length; p++) {
-		quad(
-			quads[p][0][0], quads[p][0][1],
-			quads[p][1][0], quads[p][1][1],
-			quads[p][2][0], quads[p][2][1],
-			quads[p][3][0], quads[p][3][1]
-		);
-	}
-
-
-	let p = 25;
-	stroke(0);
-	quad(
-		quads[p][0][0], quads[p][0][1],
-		quads[p][1][0], quads[p][1][1],
-		quads[p][2][0], quads[p][2][1],
-		quads[p][3][0], quads[p][3][1]
-	);
-
-	//let v1 = 
-
-	stroke(255, 0, 0);
-	line(quads[p][0][0], quads[p][0][1], quads[p][1][0], quads[p][1][1]);
-	line(quads[p][3][0], quads[p][3][1], quads[p][2][0], quads[p][2][1]);
-
-	stroke(0, 0, 255);
-	strokeWeight(3);
-	point(quads[p][0][0], quads[p][0][1]);
-	point(quads[p][3][0], quads[p][3][1]);
-
-	for (let p=0; p<quads.length; p++) {
-
-		let style = random([0,1,2]);
-		//style = 2;
-		let lines = style == 0 ? random(4,6) : random(5, 8);
-		if (random() > 0.5) {
-			linez(
-				// line 1
-				quads[p][0][0],
-				quads[p][0][1],
-				quads[p][3][0],
-				quads[p][3][1],
-				// line 2
-				quads[p][1][0],
-				quads[p][1][1],
-				quads[p][2][0],
-				quads[p][2][1],
-				// count
-				lines,
-				style
-				
-			);			
-		} else {
-
-			linez(
-				// line 1
-				quads[p][0][0],
-				quads[p][0][1],
-				quads[p][1][0],
-				quads[p][1][1],
-				// line 2
-				quads[p][3][0],
-				quads[p][3][1],
-				quads[p][2][0],
-				quads[p][2][1],
-				// count
-				lines,
-				style
-			);
-		}
-		// break;
-	}
-}
-
-// draw n lines between two lines
-function linez(
-	x1, y1, x2, y2,	// <-- line 1
-	x3, y3, x4, y4,	// <-- line 2
-	count,
-	easing			// 0 linear, 1 eased
-	) {
-	
-	let dx1 = (x2 - x1) / count;
-	let dy1 = (y2 - y1) / count;
-
-	let dx2 = (x4 - x3) / count;
-	let dy2 = (y4 - y3) / count;
-
-	strokeWeight(1);
-	stroke(0);
-
-	for (let c=0; c<=count; c++) {
-		// linear = c
-		// 1 - x^2
-
-		let pos = c;
-		if (easing==1)
-			pos = (1 - Math.pow(c/count, 2)) * count;
-
-		if (easing==2)
-			pos = (1 - Math.pow(1-c/count, 2)) * count;
-
-		line(
-			x1 + dx1*pos,
-			y1 + dy1*pos,
-			x3 + dx2*pos,
-			y3 + dy2*pos
-		);	
-	}
-}
-
 let rot = 0.0;
 
-function draw() {
+function pre_draw() {
 
-	// randomSeed(99);
+	if (gui_mode == mode_save_png_x2) {
+		resizeCanvas(1200, 1200);
+		push();
+		scale(2.0);
+	}
 
-	if (gui_mode == 11) {
+	if (gui_mode == mode_save_png) {
 		gui_mode = 0;
 		save();
 		return;
@@ -301,9 +108,6 @@ function draw() {
 		return;
 	}
 
-	//
-	// TODO move this to pre_draw setup
-	//
 	for (let objs=0; objs<gui_texts.length; objs++) {
 		if (gui_texts[objs].is_dead) {
 			gui_texts.splice(objs, 1);
@@ -313,22 +117,12 @@ function draw() {
 	for (let i=0; i<lines.length; i++) {
 		if(lines[i].dead)
 			lines.splice(i, 1);
+	}	
+}
 
-	}
-	//
-	// END TODO
-	//
+function pre_draw_events() {
 
 	let dispatched = false;
-
-	// has the user selected to place an item on the canvas?
-	if ( gui_mode > 0 ) {
-		cursor(CROSS);
-		dispatched = true;
-	} else {
-		cursor(ARROW);
-	}
-	
 
 	// the user is editing some text -
 	// don't show any mouse_over's as they move the
@@ -366,8 +160,6 @@ function draw() {
 		}
 	}
 
-
-
 	if ( !dispatched ) {
 		for (var c=0; c<columns; c++) {
 			for (var r=0; r<columns; r++) {
@@ -393,16 +185,34 @@ function draw() {
 				squares[c][r].hover_state(false);
 			}
 		}
+	}	
+}
+
+function post_draw() {
+	if (gui_mode == mode_save_png_x2) {
+		gui_mode = 0;
+		save();
+		pop();
+		
+		resizeCanvas(600, 600);
+		return;
 	}
 
-	//
-	//
-	// DRAWING
-	//
-	//
+}
 
+function draw() {
+	// randomSeed(99);
+	pre_draw();
+	pre_draw_events();
+
+	// has the user selected to place an item on the canvas?
+	if ( gui_mode > 0 ) {
+		cursor(CROSS);
+		dispatched = true;
+	} else {
+		cursor(ARROW);
+	}
 	
-
 	// draw the unimportant stuff first
 	// blank squares
 	for (var c=0; c<columns; c++) {
@@ -412,7 +222,6 @@ function draw() {
 			}
 		}
 	}
-
 
 	draw_clutter();
 
@@ -519,6 +328,7 @@ function draw() {
 		}
 	}
 
+	post_draw();
 }
 
 function mousePressed() {
