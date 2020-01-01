@@ -16,6 +16,8 @@ let objects = [];
 let gui_texts = [];
 let lines = [];
 let walls = [];
+// groups of rooms:
+let groups = [];
 
 // dragging a point in a line:
 let drag_point = null;
@@ -258,6 +260,10 @@ function draw() {
 		walls[i].display();
 	}
 
+	for (let i=0; i<groups.length; i++) {
+		groups[i].display();
+	}
+
 	if (gui_mode == mode_wall) {
 		//
 		// draw internal walls - highlight / hover event
@@ -455,7 +461,9 @@ function mouseReleased_internal_wall() {
 	}
 }
 
-
+function find_squares_in_area() {
+	//return this.
+}
 
 function mouseReleased() {
 	if (gui_mode == mode_drag) {
@@ -466,6 +474,24 @@ function mouseReleased() {
 	if (gui_mode == mode_select) {
 		// user was dragging a selection box
 		gui_mode = mode_none;
+/*
+		var select_start_pos = {
+			start_x: -1,
+			start_y: 0,
+			end_x: 0,
+			end_y: 0
+		};
+*/
+
+		let tmp = [];
+		for (var c=0; c<columns; c++) {
+			for (var r=0; r<columns; r++) {
+				if (squares[c][r].enabled) {
+					tmp.push(squares[c][r]);
+				}
+			}
+		}
+		groups.push(new Group(tmp));
 		select_start_pos.start_x = -1;
 		return;
 	}

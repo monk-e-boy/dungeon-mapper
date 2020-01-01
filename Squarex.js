@@ -577,3 +577,39 @@ class Squarex {
 	}
 
 }
+
+
+class Group {
+	constructor(squares) {
+		this.squares = squares;
+
+		this.x1 = 5000;
+		this.x2 = -1;
+		this.y1 = 5000;
+		this.y2 = -1;
+
+		for (let i=0; i<this.squares.length; i++) {
+			this.x1 = Math.min(this.squares[i].x, this.x1);
+			this.y1 = Math.min(this.squares[i].y, this.y1);
+
+			this.x2 = Math.max(this.squares[i].x + this.squares[i].size, this.x2);
+			this.y2 = Math.max(this.squares[i].y + this.squares[i].size, this.y2);
+		}
+	}
+
+	display() {
+
+		strokeWeight(2);
+		stroke(0, 0, 255, 75);
+		noFill();
+
+		rect(this.x1 - 10, this.y1 - 10, this.x2 + 10, this.y2 + 10);
+
+		fill(0, 255, 0);
+		rect(this.x2+10, this.y1-10, this.x2, this.y1);
+
+		fill(225, 0, 0);
+		circle(this.x1 + (this.x2-this.x1)/2, this.y1 + (this.y2-this.y1)/2, 10);
+
+	}
+}
