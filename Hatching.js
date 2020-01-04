@@ -103,14 +103,36 @@ class HatchListener {
 	// takes a list of lines, hatches
 	// under those lines are enabled
 	enable_hatches(points) {
+
+		for (let i=0; i<points.length; i++) {
+
+			for (let p=0; p<d_triangles.length; p++) {
+				if (d_triangles[p].is_over(points[i])) {
+					d_triangles[p].visible = true;
+				}
+			}
+		}
+
 		this.points.push(...points);
 		this.pos = 0;
 
 		// TODO: move this into script->draw()
-		this.update();
+		//this.update();
 	}
 
-	disable_hatches(points) {		
+	disable_hatches(points) {
+
+		// TODO this is broken if two rooms share a hatching
+		for (let i=0; i<points.length; i++) {
+
+			for (let p=0; p<d_triangles.length; p++) {
+				if (d_triangles[p].is_over(points[i])) {
+					d_triangles[p].visible = false;
+				}
+			}
+		}
+		return;
+
 		const filteredItems = this.points.filter(item => !points.includes(item));
 
 		for (let p=0; p<d_triangles.length; p++) {

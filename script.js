@@ -491,7 +491,11 @@ function mouseReleased() {
 		for (var c=0; c<columns; c++) {
 			for (var r=0; r<columns; r++) {
 				if (squares[c][r].enabled) {
-					tmp.push(squares[c][r]);
+					tmp.push(squares[c][r].clone());
+
+					// TODO: clean this shit up
+					squares[c][r].enabled = false;
+					squares[c][r].listener.disable_hatches(squares[c][r].hatch_list);
 				}
 			}
 		}

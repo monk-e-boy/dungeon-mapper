@@ -27,6 +27,21 @@ class Squarex {
 		this.hatch_list = this.create_hatch_list();
 	}
 
+	clone() {
+		let tmp = new Squarex(this.c, this.r, this.size);
+		tmp.enabled = this.enabled;
+		tmp.door = this.door;
+		tmp.top = this.top;
+		tmp.right = this.right;
+		tmp.bottom = this.bottom;
+		tmp.left = this.left;
+		tmp.jitter_pos = this.jitter_pos;
+		tmp.jitter = this.jitter;
+		tmp.listener = this.listener;
+		// tmp.hatch_list = this.hatch_list;
+		return tmp;
+	}
+
 	create_hatch_list() {
 		let tmp = [
 			[this.x, this.y],				// top left
@@ -69,24 +84,24 @@ class Squarex {
 		];
 
 		if (this.next_rand() > 0.8)
-			tmp.push([
+			tmp.push(
 				[this.x+this.size/2, this.y-45]
-			]);
+			);
 
 		if (this.next_rand() > 0.8)
-			tmp.push([
+			tmp.push(
 				[this.x+this.size/2, this.y+this.size+45]
-			]);
+			);
 
 		if (this.next_rand() > 0.8)
-			tmp.push([
+			tmp.push(
 				[this.x-45, this.y+this.size/2]
-			]);
+			);
 
 		if (this.next_rand() > 0.8)
-			tmp.push([
+			tmp.push(
 				[this.x+this.size+45, this.y+this.size/2]
-			]);
+			);
 
 		return tmp;
 	}
@@ -640,11 +655,106 @@ class Group {
 		circle(0, 0, 10);
 
 		pop();
+
+
+		//
+		//
+		// TODO Move all this into UPDATE()
+		//
+		//
+		for (let i=0; i<this.squares.length; i++) {
+
+			let s = this.squares[i];
+			let list = [];
+
+			for (let j=0; j<s.hatch_list.length; j++) {
+				// translate and rotate list
+				let x = s.hatch_list[j][0];
+				let y = s.hatch_list[j][1];
+
+				let v = createVector(x, y);
+				v.sub(this.x1 + halfx, this.y1 + halfy);
+				v.rotate(this.angle);
+
+				stroke(0, 0, 255);
+				strokeWeight(3);
+				v.add(this.x1 + halfx, this.y1 + halfy);
+				point(v.x, v.y);
+
+
+				// list.push([]);
+			}
+
+			// s.listener.disable_hatches(list);
+		}
 	}
 
 	update(mx, my) {
+
+		let halfx = (this.x2-this.x1)/2;
+		let halfy = (this.y2-this.y1)/2;
+		//let x = this.x1 + halfx;
+		//let y = this.y1 + halfy;
+
+		for (let i=0; i<this.squares.length; i++) {
+
+			let s = this.squares[i];
+			let list = [];
+
+			for (let j=0; j<s.hatch_list.length; j++) {
+				// translate and rotate list
+				let x = s.hatch_list[j][0];
+				let y = s.hatch_list[j][1];
+
+				let v = createVector(x, y);
+				v.sub(this.x1 + halfx, this.y1 + halfy);
+				v.rotate(this.angle);
+
+				stroke(0, 0, 255);
+				strokeWeight(3);
+				v.add(this.x1 + halfx, this.y1 + halfy);
+
+
+				list.push([Math.floor(v.x), Math.floor(v.y)]);
+			}
+
+			s.listener.disable_hatches(list);
+		}
+		
+
+
 		let x = this.x1 + (this.x2-this.x1)/2;
 		let y = this.y1 + (this.y2-this.y1)/2;
 		this.angle = atan2(my - y, mx - x);
+
+
+		for (let i=0; i<this.squares.length; i++) {
+
+			let s = this.squares[i];
+			let list = [];
+
+			for (let j=0; j<s.hatch_list.length; j++) {
+				// translate and rotate list
+				let x = s.hatch_list[j][0];
+				let y = s.hatch_list[j][1];
+
+				let v = createVector(x, y);
+				v.sub(this.x1 + halfx, this.y1 + halfy);
+				v.rotate(this.angle);
+
+				stroke(0, 0, 255);
+				strokeWeight(3);
+				v.add(this.x1 + halfx, this.y1 + halfy);
+
+
+				list.push([Math.floor(v.x), Math.floor(v.y)]);
+			}
+
+			s.listener.enable_hatches(list);
+		}
+		
+
+		// this.listener.enable_hatches(this.hatch_list);
+
 	}
 }
