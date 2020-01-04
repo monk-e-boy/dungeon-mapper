@@ -414,6 +414,10 @@ function mouseDragged() {
 		select_start_pos.end_x = mouseX;
 		select_start_pos.end_y = mouseY;
 	}
+
+	if (groups.length > 0) {
+		groups[0].update(mouseX, mouseY);
+	}
 }
 
 

@@ -195,6 +195,13 @@ class Squarex {
 		pop();
 	}
 
+	display_offset(x, y) {
+		push();
+		translate(-x, -y);
+		this.display();
+		pop();
+	}
+
 	display() {
 
 
@@ -583,6 +590,8 @@ class Group {
 	constructor(squares) {
 		this.squares = squares;
 
+		this.angle = 0;
+
 		this.x1 = 5000;
 		this.x2 = -1;
 		this.y1 = 5000;
@@ -598,18 +607,44 @@ class Group {
 	}
 
 	display() {
+		let halfx = (this.x2-this.x1)/2;
+		let halfy = (this.y2-this.y1)/2;
+		let x = this.x1 + halfx;
+		let y = this.y1 + halfy;
+
+		push();
+		translate(x, y);
+		rotate(this.angle);
+
+		for (let i=0; i<this.squares.length; i++) {
+			this.squares[i].display_offset(x, y);
+		}
 
 		strokeWeight(2);
 		stroke(0, 0, 255, 75);
 		noFill();
 
-		rect(this.x1 - 10, this.y1 - 10, this.x2 + 10, this.y2 + 10);
+		rect( -(halfx + 10), -(halfy + 10), halfx + 10, halfy + 10);
 
 		fill(0, 255, 0);
-		rect(this.x2+10, this.y1-10, this.x2, this.y1);
+		rect(halfx+10, -(halfy+10), halfx, -halfy);
 
-		fill(225, 0, 0);
-		circle(this.x1 + (this.x2-this.x1)/2, this.y1 + (this.y2-this.y1)/2, 10);
+		stroke(0, 0, 255);
+		strokeWeight(7);
+		arc(halfx, -halfy, 50, 50, -HALF_PI, 0, OPEN);
 
+
+		strokeWeight(1);
+		stroke(0);
+		fill(100, 100, 100);
+		circle(0, 0, 10);
+
+		pop();
+	}
+
+	update(mx, my) {
+		let x = this.x1 + (this.x2-this.x1)/2;
+		let y = this.y1 + (this.y2-this.y1)/2;
+		this.angle = atan2(my - y, mx - x);
 	}
 }
