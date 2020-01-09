@@ -33,6 +33,15 @@ class Rooms {
 		}
 	}
 
+	recreate_hatch_list() {
+		for (var c=0; c<this.columns; c++) {
+			for (var r=0; r<this.rows; r++) {
+				if (squares[c][r].enabled)
+					squares[c][r].create_hatch_list();
+			}
+		}
+	}
+
 	enable_walls(squares, c, r) {
 
 		// turn borders OFF if the square is enabled

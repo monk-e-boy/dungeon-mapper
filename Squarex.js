@@ -24,7 +24,7 @@ class Squarex {
 		this.listener = false;
 		// remember this so we can turn the
 		// hatches on/off as we see fit
-		this.hatch_list = this.create_hatch_list();
+		this.create_hatch_list();
 	}
 
 	clone() {
@@ -38,11 +38,47 @@ class Squarex {
 		tmp.jitter_pos = this.jitter_pos;
 		tmp.jitter = this.jitter;
 		tmp.listener = this.listener;
-		// tmp.hatch_list = this.hatch_list;
+		tmp.hatch_list = this.hatch_list;
 		return tmp;
 	}
 
 	create_hatch_list() {
+
+		if ( !this.enabled) {
+			this.hatch_list = [];
+			return;
+		}
+
+		let tmp = [];
+
+		if (this.top || this.left) {
+			tmp.push([0, 0]);	// top left
+		}
+
+		if (this.top || this.right) {
+			tmp.push([this.size, 0]);	// top right
+		}
+
+		if (this.bottom || this.left) {
+			tmp.push([0, this.size]);	// bottom left
+		}
+
+		if (this.bottom || this.right) {
+			tmp.push([this.size, this.size]);	// bottom right
+		}
+
+		if (this.top) {
+			// funky lines:
+			// mid top going up
+			tmp.push([this.size/2, 0]);
+			tmp.push([this.size/2, -7]);
+			tmp.push([this.size/2, -15]);			
+		}
+
+		this.hatch_list =  tmp;
+	}
+
+	create_hatch_list_() {
 		let tmp = [
 			[this.x, this.y],				// top left
 			[this.x+this.size, this.y],		// top right
@@ -156,8 +192,16 @@ class Squarex {
 		}
 
 		if (this.enabled && this.listener) {
+			let list = [];
+
+			for (let j=0; j<this.hatch_list.length; j++) {
+				// translate and rotate list
+				let x = this.x + this.hatch_list[j][0];
+				let y = this.y + this.hatch_list[j][1];
+				list.push([x,y]);
+			}
 			// TODO: make listener a list:
-			this.listener.enable_hatches(this.hatch_list);
+			this.listener.enable_hatches(list);
 		}
 
 		if ( !this.enabled && this.listener) {
@@ -210,11 +254,34 @@ class Squarex {
 		pop();
 	}
 
+/*
 	display_offset(x, y) {
 		push();
 		translate(-x, -y);
 		this.display();
 		pop();
+	}
+*/
+
+	display_clutter_debug() {
+		for (let j=0; j<this.hatch_list.length; j++) {
+			// translate and rotate list
+			let x = this.hatch_list[j][0];
+			let y = this.hatch_list[j][1];
+
+			//let v = createVector(x, y);
+			//v.sub(this.x1, this.y1);
+			//v.rotate(this.angle);
+
+			stroke(0, 0, 255);
+			strokeWeight(3);
+			//v.add(this.x1, this.y1);
+			point(this.x + x, this.y + y);
+
+
+			// list.push([]);
+		}
+
 	}
 
 	display() {
@@ -604,8 +671,11 @@ class Squarex {
 class Group {
 	constructor(squares) {
 		this.squares = squares;
+		this.centre_button = new RotateCenterButton(this, 0, 0);
 
 		this.angle = 0;
+		this.c_angle = 0; //The initial mouse rotation
+		this.q_angle = 0;
 
 		this.x1 = 5000;
 		this.x2 = -1;
@@ -619,6 +689,20 @@ class Group {
 			this.x2 = Math.max(this.squares[i].x + this.squares[i].size, this.x2);
 			this.y2 = Math.max(this.squares[i].y + this.squares[i].size, this.y2);
 		}
+
+		// move all of the squares so their co-ords are
+		// now internal co-ods
+		// 0, 0 is at the center of the group box
+		let halfx = (this.x2-this.x1)/2;
+		let halfy = (this.y2-this.y1)/2;
+
+		for (let i=0; i<this.squares.length; i++) {
+			this.squares[i].x -= (this.x1 + halfx);
+			this.squares[i].y -= (this.y1 + halfy);
+		}
+
+		// trigger the HATCHING
+		this.update(0, 0);
 	}
 
 	display() {
@@ -632,7 +716,10 @@ class Group {
 		rotate(this.angle);
 
 		for (let i=0; i<this.squares.length; i++) {
-			this.squares[i].display_offset(x, y);
+			//this.squares[i].display_offset(x, y);
+			this.squares[i].display();
+
+			this.squares[i].display_clutter_debug();
 		}
 
 		strokeWeight(2);
@@ -649,17 +736,15 @@ class Group {
 		arc(halfx, -halfy, 50, 50, -HALF_PI, 0, OPEN);
 
 
-		strokeWeight(1);
-		stroke(0);
-		fill(100, 100, 100);
-		circle(0, 0, 10);
+		//
+		this.centre_button.render();
 
 		pop();
 
 
 		//
 		//
-		// TODO Move all this into UPDATE()
+		// DEBUG the hatching triggers
 		//
 		//
 		for (let i=0; i<this.squares.length; i++) {
@@ -673,12 +758,12 @@ class Group {
 				let y = s.hatch_list[j][1];
 
 				let v = createVector(x, y);
-				v.sub(this.x1 + halfx, this.y1 + halfy);
+				v.sub(this.x1, this.y1);
 				v.rotate(this.angle);
 
 				stroke(0, 0, 255);
 				strokeWeight(3);
-				v.add(this.x1 + halfx, this.y1 + halfy);
+				v.add(this.x1, this.y1);
 				point(v.x, v.y);
 
 
@@ -687,6 +772,27 @@ class Group {
 
 			// s.listener.disable_hatches(list);
 		}
+	}
+
+	mouseMoved(x, y) {
+		// TODO: update can move into here (I think - need to check)
+
+		let halfx = (this.x2-this.x1)/2;
+		let halfy = (this.y2-this.y1)/2;
+		let mx = this.x1 + halfx;
+		let my = this.y1 + halfy;
+
+		this.centre_button.mouseMoved(x-mx, y-my);
+	}
+
+	mousePressed(mx, my) {
+		let x = this.x1 + (this.x2-this.x1)/2;
+		let y = this.y1 + (this.y2-this.y1)/2;
+		// this.angle_offset = this.angle + atan2(my - y, mx - x);
+		// this.angle_offset = atan2(my - y, mx - x);
+
+		this.c_angle = atan2(my - y, mx - x); //The initial mouse rotation
+		this.q_angle = this.angle; //Initial box rotation
 	}
 
 	update(mx, my) {
@@ -703,8 +809,8 @@ class Group {
 
 			for (let j=0; j<s.hatch_list.length; j++) {
 				// translate and rotate list
-				let x = s.hatch_list[j][0];
-				let y = s.hatch_list[j][1];
+				let x = this.x1 + halfx + s.x + s.hatch_list[j][0];
+				let y = this.y1 + halfy + s.y + s.hatch_list[j][1];
 
 				let v = createVector(x, y);
 				v.sub(this.x1 + halfx, this.y1 + halfy);
@@ -722,10 +828,27 @@ class Group {
 		}
 		
 
+		if (this.centre_button.mouse_over) {
+			// dragging
+			this.x1 = mouseX - halfx;
+			this.x2 = mouseX + halfx;
 
-		let x = this.x1 + (this.x2-this.x1)/2;
-		let y = this.y1 + (this.y2-this.y1)/2;
-		this.angle = atan2(my - y, mx - x);
+			this.y1 = mouseY - halfy;
+			this.y2 = mouseY + halfy;
+
+		} else {
+			// rotating
+			let x = this.x1 + (this.x2-this.x1)/2;
+			let y = this.y1 + (this.y2-this.y1)/2;
+
+			let m_angle = atan2(my - y, mx - x);
+
+			let dangle = m_angle - this.c_angle; //How much the box needs to be rotated
+			if (dangle>=TWO_PI) dangle-=TWO_PI; //clamping
+			if (dangle<0) dangle+=TWO_PI; //clamping
+			this.angle =  this.q_angle + dangle; //Apply the rotation
+			if (this.angle>=TWO_PI) this.angle -= TWO_PI; //clamping
+		}
 
 
 		for (let i=0; i<this.squares.length; i++) {
@@ -735,8 +858,8 @@ class Group {
 
 			for (let j=0; j<s.hatch_list.length; j++) {
 				// translate and rotate list
-				let x = s.hatch_list[j][0];
-				let y = s.hatch_list[j][1];
+				let x = this.x1 + halfx + s.x + s.hatch_list[j][0];
+				let y = this.y1 + halfy + s.y + s.hatch_list[j][1];
 
 				let v = createVector(x, y);
 				v.sub(this.x1 + halfx, this.y1 + halfy);

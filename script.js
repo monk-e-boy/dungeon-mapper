@@ -3,6 +3,8 @@
 //let LEFT = 3
 //let RIGHT = 4
 
+p5.disableFriendlyErrors = true; // disables FES
+
 
 let rooms = null;
 let _object = null;
@@ -31,6 +33,7 @@ let mode_drag = 132;
 let mode_add_points = 131;
 let mode_wall = 14;
 let mode_select = 15;
+let mode_group_interaction = 16;
 
 let gui_mode = mode_none;
 
@@ -162,6 +165,17 @@ function pre_draw_events() {
 		}
 	}
 
+
+	//
+    //
+    // TEMP FIX
+    //
+    //
+    if (groups.length > 0) dispatched=true;
+    //
+    //
+    //
+
 	if ( !dispatched ) {
 		for (var c=0; c<columns; c++) {
 			for (var r=0; r<columns; r++) {
@@ -187,7 +201,9 @@ function pre_draw_events() {
 				squares[c][r].hover_state(false);
 			}
 		}
-	}	
+	}
+
+		
 }
 
 function post_draw() {
@@ -200,6 +216,20 @@ function post_draw() {
 		return;
 	}
 
+}
+
+function mouseMoved() {
+	//
+	// TODO: a lot of pre_draw can move into here
+	//
+
+	let dispatched = false;
+
+	if ( !dispatched) {
+		for (let i=0; i<groups.length; i++) {
+			groups[i].mouseMoved(mouseX, mouseY);
+		}
+	}
 }
 
 function draw() {
@@ -385,6 +415,13 @@ function mousePressed() {
 		select_start_pos.start_x = mouseX;
 		select_start_pos.start_y = mouseY;
 	}
+
+	//
+	// Maybe rotating a group
+	//
+	if (groups.length > 0) {
+		groups[0].mousePressed(mouseX, mouseY);
+	}
 }
 
 var select_start_pos = {
@@ -492,6 +529,7 @@ function mouseReleased() {
 			for (var r=0; r<columns; r++) {
 				if (squares[c][r].enabled) {
 					tmp.push(squares[c][r].clone());
+
 
 					// TODO: clean this shit up
 					squares[c][r].enabled = false;
@@ -683,12 +721,24 @@ function mouseReleased() {
 
     if (dispatched) return;
 
+
+    //
+    //
+    // TEMP FIX
+    //
+    //
+    if (groups.length > 0) return;
+    //
+    //
+    //
+
 	for (var c=0; c<columns; c++) {
 		for (var r=0; r<columns; r++) {
 			if (squares[c][r].is_over(mouseX, mouseY)){
 				squares[c][r].onClick();
 
 				rooms.enable_walls(squares, c, r);
+				rooms.recreate_hatch_list();
 			}
 		}
 	}

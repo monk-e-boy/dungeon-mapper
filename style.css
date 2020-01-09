@@ -1,3 +1,10 @@
+.grid-container {
+	display: grid;
+	grid-template-columns: 75px auto;
+	grid-template-rows: 1fr;
+	grid-template-areas: ". .";
+}
+
 #sketch-holder canvas {
 	border: 1px solid #000000;
 }
