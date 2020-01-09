@@ -52,19 +52,23 @@ class Squarex {
 		let tmp = [];
 
 		if (this.top || this.left) {
-			tmp.push([0, 0]);	// top left
+			tmp.push([0, 0]);               // top left
+			tmp.push([-5, -5]); // diagonal top left
 		}
 
 		if (this.top || this.right) {
-			tmp.push([this.size, 0]);	// top right
+			tmp.push([this.size, 0]);    // top right
+			tmp.push([this.size+5, -5]); // diagonal top right
 		}
 
 		if (this.bottom || this.left) {
-			tmp.push([0, this.size]);	// bottom left
+			tmp.push([0, this.size]);                 // bottom left
+			tmp.push([-5, this.size+5]); // diagonal bottom left
 		}
 
 		if (this.bottom || this.right) {
-			tmp.push([this.size, this.size]);	// bottom right
+			tmp.push([this.size, this.size]);	  // bottom right
+			tmp.push([this.size+5, this.size+5]); // diagonal bottom right
 		}
 
 		if (this.top) {
@@ -73,6 +77,24 @@ class Squarex {
 			tmp.push([this.size/2, 0]);
 			tmp.push([this.size/2, -7]);
 			tmp.push([this.size/2, -15]);			
+		}
+
+		if (this.bottom) {
+			tmp.push([this.size/2, this.size]);
+			tmp.push([this.size/2, this.size+10]);
+			tmp.push([this.size/2, this.size+15]);
+		}
+
+		if (this.left) {
+			tmp.push([0, this.size/2]);
+			tmp.push([-10, this.size/2]);
+			tmp.push([-15, this.size/2]);
+		}
+
+		if (this.right) {
+			tmp.push([this.size, this.size/2]);
+			tmp.push([this.size+10, this.size/2]);
+			tmp.push([this.size+15, this.size/2]);
 		}
 
 		this.hatch_list =  tmp;
@@ -672,6 +694,7 @@ class Group {
 	constructor(squares) {
 		this.squares = squares;
 		this.centre_button = new RotateCenterButton(this, 0, 0);
+		this.enabled = true;
 
 		this.angle = 0;
 		this.c_angle = 0; //The initial mouse rotation
@@ -701,6 +724,9 @@ class Group {
 			this.squares[i].y -= (this.y1 + halfy);
 		}
 
+		// top right
+		this.close_button = new CloseButton(this, halfx+10, -(halfy+10));
+
 		// trigger the HATCHING
 		this.update(0, 0);
 	}
@@ -719,70 +745,46 @@ class Group {
 			//this.squares[i].display_offset(x, y);
 			this.squares[i].display();
 
-			this.squares[i].display_clutter_debug();
+			if (this.enabled)
+				this.squares[i].display_clutter_debug();
 		}
 
-		strokeWeight(2);
-		stroke(0, 0, 255, 75);
-		noFill();
+		if (this.enabled) {
+			strokeWeight(2);
+			stroke(0, 0, 255, 75);
+			noFill();
 
-		rect( -(halfx + 10), -(halfy + 10), halfx + 10, halfy + 10);
+			rect( -(halfx + 10), -(halfy + 10), halfx + 10, halfy + 10);
 
-		fill(0, 255, 0);
-		rect(halfx+10, -(halfy+10), halfx, -halfy);
+			fill(0, 255, 0);
+			rect(halfx+10, -(halfy+10), halfx, -halfy);
 
-		stroke(0, 0, 255);
-		strokeWeight(7);
-		arc(halfx, -halfy, 50, 50, -HALF_PI, 0, OPEN);
+			stroke(0, 0, 255);
+			strokeWeight(7);
+			arc(halfx, -halfy, 50, 50, -HALF_PI, 0, OPEN);
 
 
-		//
-		this.centre_button.render();
+			//
+			this.centre_button.render();
+			this.close_button.render();			
+		}
 
 		pop();
-
-
-		//
-		//
-		// DEBUG the hatching triggers
-		//
-		//
-		for (let i=0; i<this.squares.length; i++) {
-
-			let s = this.squares[i];
-			let list = [];
-
-			for (let j=0; j<s.hatch_list.length; j++) {
-				// translate and rotate list
-				let x = s.hatch_list[j][0];
-				let y = s.hatch_list[j][1];
-
-				let v = createVector(x, y);
-				v.sub(this.x1, this.y1);
-				v.rotate(this.angle);
-
-				stroke(0, 0, 255);
-				strokeWeight(3);
-				v.add(this.x1, this.y1);
-				point(v.x, v.y);
-
-
-				// list.push([]);
-			}
-
-			// s.listener.disable_hatches(list);
-		}
 	}
 
-	mouseMoved(x, y) {
-		// TODO: update can move into here (I think - need to check)
+	mouseMoved(mx, my) {
+		// TODO: "update()" can move into here (I think - need to check)
 
-		let halfx = (this.x2-this.x1)/2;
-		let halfy = (this.y2-this.y1)/2;
-		let mx = this.x1 + halfx;
-		let my = this.y1 + halfy;
+		// translate to local co-ordinates
+		let x = this.x1 + (this.x2-this.x1)/2;
+		let y = this.y1 + (this.y2-this.y1)/2;
 
-		this.centre_button.mouseMoved(x-mx, y-my);
+		let v = createVector(mx, my);
+		v.sub(x, y);
+		v.rotate(-this.angle);
+
+		this.centre_button.mouseMoved(v.x, v.y);
+		this.close_button.mouseMoved(v.x, v.y);
 	}
 
 	mousePressed(mx, my) {
@@ -793,6 +795,14 @@ class Group {
 
 		this.c_angle = atan2(my - y, mx - x); //The initial mouse rotation
 		this.q_angle = this.angle; //Initial box rotation
+	}
+
+	mouseReleased(mx, my) {
+		this.close_button.mouseReleased();
+	}
+
+	close_clicked() {
+		this.enabled = false;
 	}
 
 	update(mx, my) {
@@ -865,8 +875,8 @@ class Group {
 				v.sub(this.x1 + halfx, this.y1 + halfy);
 				v.rotate(this.angle);
 
-				stroke(0, 0, 255);
-				strokeWeight(3);
+				// stroke(0, 0, 255);
+				// strokeWeight(3);
 				v.add(this.x1 + halfx, this.y1 + halfy);
 
 

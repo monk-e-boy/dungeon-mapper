@@ -727,6 +727,9 @@ function mouseReleased() {
     // TEMP FIX
     //
     //
+    if (groups.length > 0) {
+		groups[0].mouseReleased(mouseX, mouseY);
+	}
     if (groups.length > 0) return;
     //
     //

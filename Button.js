@@ -193,3 +193,61 @@ class RotateCenterButton {
 		pop();
 	}
 }
+
+class CloseButton {
+	constructor(parent, x, y) {
+		// x and y are relative to parent/containter
+		this.x = x;
+		this.y = y;
+		this.size = 20;
+		this.parent = parent;
+		this.mouse_over = false;
+		this.mouse_near = false;
+
+		this.tmpx = 0;
+		this.tmpy = 0;
+	}
+
+	is_over(x, y) {
+		let d = int(dist(x, y, this.x, this.y));
+		if (d < this.size/2) {
+			return true;
+		}
+		return false;
+	}
+
+
+	is_near(x, y) {
+		let d = int(dist(x, y, this.x, this.y));
+		return d < this.size * 1.2;
+	}
+
+	mouseMoved(x, y) {
+		this.mouse_over = this.is_over(x, y);
+
+		this.tmpx=x;
+		this.tmpy=y;
+	}
+
+	mouseReleased() {
+		if (this.mouse_over)
+			this.parent.close_clicked();
+	}
+
+	render() {
+		// add point
+		strokeWeight(1);
+		stroke(0);
+		fill(0, 204, 0, 127);
+
+		if (this.mouse_over)
+			fill(0, 204, 0);
+
+		circle(this.x, this.y, this.size);
+
+		stroke("red");
+		strokeWeight(3);
+		point(this.tmpx, this.tmpy);
+ 	}
+
+}
