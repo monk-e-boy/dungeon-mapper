@@ -33,11 +33,10 @@ class Rooms {
 		}
 	}
 
-	recreate_hatch_list() {
+	refresh_hatchings() {
 		for (var c=0; c<this.columns; c++) {
 			for (var r=0; r<this.rows; r++) {
-				if (squares[c][r].enabled)
-					squares[c][r].create_hatch_list();
+				squares[c][r].update_hatches();
 			}
 		}
 	}

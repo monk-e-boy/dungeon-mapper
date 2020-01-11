@@ -574,7 +574,7 @@ function group_squares_in_area() {
 					// TODO: clean this shit up
 					squares[c][r].enabled = false;
 					squares[c][r].listener.disable_hatches(squares[c][r].hatch_list);	
-				}					
+				}
 			}
 		}
 	}
@@ -584,12 +584,15 @@ function group_squares_in_area() {
 	var a = document.createElement("a");
 	a.href = "javascript:gui_mode_group("+ pos +");";
 	a.appendChild(document.createTextNode("Group "+groups.length));
-	a.className = "selected";
+	//a.className = "selected";
 	a.setAttribute("id", "layer-"+pos);
 	var element = document.getElementById("layers");
 	element.appendChild(a);
 
 	select_start_pos.start_x = -1;
+
+	gui_mode_group(pos);
+	toggle_gui_all_off();
 }
 
 function mouseReleased() {
@@ -783,7 +786,6 @@ function mouseReleased() {
     if (dispatched) return;
 
 
-    //if (groups.length > 0) {
     if (gui_mode == mode_group_interaction) {
     	// user is interacting with a group layer
     	let pos = -1;
@@ -795,12 +797,8 @@ function mouseReleased() {
     		dispatched = true;
 		}
 	}
+
 	if (dispatched) return;
-
-	//if (gui_mode == mode_group_interaction || gui_mode == mode_select)
-
-
-    // if (groups.length > 0) return;
     
 	for (var c=0; c<columns; c++) {
 		for (var r=0; r<columns; r++) {
@@ -808,7 +806,7 @@ function mouseReleased() {
 				squares[c][r].onClick();
 
 				rooms.enable_walls(squares, c, r);
-				rooms.recreate_hatch_list();
+				rooms.refresh_hatchings();
 			}
 		}
 	}

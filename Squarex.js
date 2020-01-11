@@ -44,7 +44,8 @@ class Squarex {
 
 	create_hatch_list() {
 
-		if ( !this.enabled) {
+		if (!this.enabled) {
+			// if this room is off, don't hatch anything
 			this.hatch_list = [];
 			return;
 		}
@@ -100,70 +101,19 @@ class Squarex {
 		this.hatch_list =  tmp;
 	}
 
-	create_hatch_list_() {
-		let tmp = [
-			[this.x, this.y],				// top left
-			[this.x+this.size, this.y],		// top right
-			[this.x, this.y+this.size],		// bottom left
-			[this.x+this.size, this.y+this.size],	// bottom right
-			// funky lines:
-			// mid top going up
-			[this.x+this.size/2, this.y],
-			[this.x+this.size/2, this.y-10],
-			[this.x+this.size/2, this.y-15],
-			//[this.x+this.size/2, this.y-20],
-			//[this.x+this.size/2, this.y-25],
-			// mid bottom going down
-			[this.x+this.size/2, this.y+this.size],
-			[this.x+this.size/2, this.y+this.size+10],
-			[this.x+this.size/2, this.y+this.size+15],
-			//[this.x+this.size/2, this.y+this.size+20],
-			//[this.x+this.size/2, this.y+this.size+25],
-			// mid left going left
-			[this.x, this.y+this.size/2],
-			[this.x-10, this.y+this.size/2],
-			[this.x-15, this.y+this.size/2],
-			//[this.x-20, this.y+this.size/2],
-			//[this.x-25, this.y+this.size/2],
-			// mid right going right
-			[this.x+this.size, this.y+this.size/2],
-			[this.x+this.size+10, this.y+this.size/2],
-			[this.x+this.size+15, this.y+this.size/2],
-			//[this.x+this.size+20, this.y+this.size/2],
-			//[this.x+this.size+25, this.y+this.size/2],
-			// diagonal top left
-			[this.x-5, this.y-5],
-			// diagonal top right
-			[this.x+this.size+5, this.y-5],
-			// diagonal bottom left
-			[this.x-5, this.y+this.size+5],
-			// diagonal bottom right
-			[this.x+this.size+5, this.y+this.size+5],
-		];
+	get_hatch_list() {
+		let list = [];
 
-		if (this.next_rand() > 0.8)
-			tmp.push(
-				[this.x+this.size/2, this.y-45]
-			);
-
-		if (this.next_rand() > 0.8)
-			tmp.push(
-				[this.x+this.size/2, this.y+this.size+45]
-			);
-
-		if (this.next_rand() > 0.8)
-			tmp.push(
-				[this.x-45, this.y+this.size/2]
-			);
-
-		if (this.next_rand() > 0.8)
-			tmp.push(
-				[this.x+this.size+45, this.y+this.size/2]
-			);
-
-		return tmp;
+		for (let j=0; j<this.hatch_list.length; j++) {
+			// translate and rotate list
+			let x = this.x + this.hatch_list[j][0];
+			let y = this.y + this.hatch_list[j][1];
+			list.push([x,y]);
+		}
+		return list;
 	}
 
+	
 	save() {
 		// return a json representation of this object
 		return {
@@ -213,22 +163,26 @@ class Squarex {
 			this.door = false;
 		}
 
-		if (this.enabled && this.listener) {
-			let list = [];
+	}
 
-			for (let j=0; j<this.hatch_list.length; j++) {
-				// translate and rotate list
-				let x = this.x + this.hatch_list[j][0];
-				let y = this.y + this.hatch_list[j][1];
-				list.push([x,y]);
-			}
-			// TODO: make listener a list:
-			this.listener.enable_hatches(list);
+	update_hatches() {
+
+		if ( !this.listener) return;
+
+		
+
+		if (this.enabled && this.listener) {
+			// check where we want to hatch
+			this.create_hatch_list();
+			// tell the hatching layer to show
+			this.listener.enable_hatches(this.get_hatch_list());
 		}
 
 		if ( !this.enabled && this.listener) {
-			// TODO: make listener a list:
-			this.listener.disable_hatches(this.hatch_list);
+			// remove the hatches
+			this.listener.disable_hatches(this.get_hatch_list());
+			// update the hatch list (set to empty)
+			this.create_hatch_list();
 		}
 
 	}
@@ -276,14 +230,6 @@ class Squarex {
 		pop();
 	}
 
-/*
-	display_offset(x, y) {
-		push();
-		translate(-x, -y);
-		this.display();
-		pop();
-	}
-*/
 
 	display_clutter_debug() {
 		for (let j=0; j<this.hatch_list.length; j++) {
@@ -728,7 +674,8 @@ class Group {
 		this.close_button = new CloseButton(this, halfx+10, -(halfy+10));
 
 		// trigger the HATCHING
-		this.update(0, 0);
+		//this.update(0, 0);
+		this.enable_hatches();
 	}
 
 	display() {
@@ -861,6 +808,12 @@ class Group {
 			if (this.angle>=TWO_PI) this.angle -= TWO_PI; //clamping
 		}
 
+		this.enable_hatches();
+	}
+
+	enable_hatches() {
+		let halfx = (this.x2-this.x1)/2;
+		let halfy = (this.y2-this.y1)/2;
 
 		for (let i=0; i<this.squares.length; i++) {
 
@@ -887,8 +840,6 @@ class Group {
 			s.listener.enable_hatches(list);
 		}
 		
-
 		// this.listener.enable_hatches(this.hatch_list);
-
 	}
 }
