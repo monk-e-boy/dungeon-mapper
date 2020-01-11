@@ -803,6 +803,7 @@ class Group {
 
 	close_clicked() {
 		this.enabled = false;
+		gui_mode_group(-1);
 	}
 
 	update(mx, my) {

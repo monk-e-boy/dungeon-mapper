@@ -33,7 +33,7 @@ let mode_drag = 132;
 let mode_add_points = 131;
 let mode_wall = 14;
 let mode_select = 15;
-let mode_group_interaction = 16;
+let mode_group_interaction = 17;
 
 let gui_mode = mode_none;
 
@@ -55,6 +55,38 @@ function toggle_gui_mode(mode) {
 	} else {
 		gui_mode = mode_none;
 	}
+}
+
+function gui_mode_group(id) {
+	for (let i=0; i<groups.length; i++) {
+		groups[i].enabled=false;
+	}
+
+	if (id != -1) {
+		gui_mode = mode_group_interaction;
+		groups[id].enabled=true;
+	} else {
+		// bottom layer chosen
+		gui_mode = mode_none;
+	}
+
+	
+	// set the GUI reflect internal state
+	// turn off all selected indeicators
+	var element = document.getElementById("layer-bottom");
+	element.className = "";
+	for (let i=0; i<groups.length; i++) {
+		var element = document.getElementById("layer-"+i);
+		element.className = "";
+	}
+
+	if (id==-1) {
+		var element = document.getElementById("layer-bottom");
+		element.className = "selected";
+	} else {
+		var element = document.getElementById("layer-"+id);
+		element.className = "selected";
+	}	
 }
 
 function preload() {
@@ -171,10 +203,15 @@ function pre_draw_events() {
     // TEMP FIX
     //
     //
-    if (groups.length > 0) dispatched=true;
+    //if (groups.length > 0) dispatched=true;
     //
     //
     //
+
+    if (gui_mode == mode_group_interaction || gui_mode == mode_select) {
+    	// user is interacting with a group layer
+    	dispatched = true;
+    }
 
 	if ( !dispatched ) {
 		for (var c=0; c<columns; c++) {
@@ -452,8 +489,12 @@ function mouseDragged() {
 		select_start_pos.end_y = mouseY;
 	}
 
-	if (groups.length > 0) {
-		groups[0].update(mouseX, mouseY);
+	let pos = -1;
+	for (let i=0; i<groups.length; i++) {
+		if (groups[i].enabled) pos = i;
+	}
+	if (pos > -1) {
+		groups[pos].update(mouseX, mouseY);
 	}
 }
 
@@ -502,8 +543,53 @@ function mouseReleased_internal_wall() {
 	}
 }
 
-function find_squares_in_area() {
-	//return this.
+function group_squares_in_area() {
+	// user was dragging a selection box
+	// now they are interacting with a
+	// layer group
+	gui_mode = mode_group_interaction;
+/*
+	var select_start_pos = {
+		start_x: -1,
+		start_y: 0,
+		end_x: 0,
+		end_y: 0
+	};
+*/
+
+	let tmp = [];
+	for (var c=0; c<columns; c++) {
+		for (var r=0; r<columns; r++) {
+			let s = squares[c][r];
+			if (s.enabled) {
+				if (
+					s.x > select_start_pos.start_x &&
+					s.x + s.size < select_start_pos.end_x &&
+					s.y > select_start_pos.start_y &&
+					s.y + s.size < select_start_pos.end_y
+					) {
+
+					tmp.push(squares[c][r].clone());
+
+					// TODO: clean this shit up
+					squares[c][r].enabled = false;
+					squares[c][r].listener.disable_hatches(squares[c][r].hatch_list);	
+				}					
+			}
+		}
+	}
+	groups.push(new Group(tmp));
+	let pos = groups.length-1;
+
+	var a = document.createElement("a");
+	a.href = "javascript:gui_mode_group("+ pos +");";
+	a.appendChild(document.createTextNode("Group "+groups.length));
+	a.className = "selected";
+	a.setAttribute("id", "layer-"+pos);
+	var element = document.getElementById("layers");
+	element.appendChild(a);
+
+	select_start_pos.start_x = -1;
 }
 
 function mouseReleased() {
@@ -513,32 +599,7 @@ function mouseReleased() {
 	}
 
 	if (gui_mode == mode_select) {
-		// user was dragging a selection box
-		gui_mode = mode_none;
-/*
-		var select_start_pos = {
-			start_x: -1,
-			start_y: 0,
-			end_x: 0,
-			end_y: 0
-		};
-*/
-
-		let tmp = [];
-		for (var c=0; c<columns; c++) {
-			for (var r=0; r<columns; r++) {
-				if (squares[c][r].enabled) {
-					tmp.push(squares[c][r].clone());
-
-
-					// TODO: clean this shit up
-					squares[c][r].enabled = false;
-					squares[c][r].listener.disable_hatches(squares[c][r].hatch_list);
-				}
-			}
-		}
-		groups.push(new Group(tmp));
-		select_start_pos.start_x = -1;
+		group_squares_in_area();
 		return;
 	}
 
@@ -722,19 +783,25 @@ function mouseReleased() {
     if (dispatched) return;
 
 
-    //
-    //
-    // TEMP FIX
-    //
-    //
-    if (groups.length > 0) {
-		groups[0].mouseReleased(mouseX, mouseY);
+    //if (groups.length > 0) {
+    if (gui_mode == mode_group_interaction) {
+    	// user is interacting with a group layer
+    	let pos = -1;
+		for (let i=0; i<groups.length; i++) {
+			if (groups[i].enabled) pos = i;
+		}
+		if (pos > -1) {
+			groups[pos].mouseReleased(mouseX, mouseY);
+    		dispatched = true;
+		}
 	}
-    if (groups.length > 0) return;
-    //
-    //
-    //
+	if (dispatched) return;
 
+	//if (gui_mode == mode_group_interaction || gui_mode == mode_select)
+
+
+    // if (groups.length > 0) return;
+    
 	for (var c=0; c<columns; c++) {
 		for (var r=0; r<columns; r++) {
 			if (squares[c][r].is_over(mouseX, mouseY)){

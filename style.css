@@ -119,3 +119,15 @@
   background-color: #ffcc00;
   border: 1px solid #ffcc00;
 }
+
+#layers {
+
+}
+
+#layers a {
+	display: block;
+}
+
+#layers a.selected {
+	background-color: #ffcc00;
+}
