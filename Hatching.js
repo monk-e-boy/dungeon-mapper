@@ -109,6 +109,7 @@ class HatchListener {
 			for (let p=0; p<d_triangles.length; p++) {
 				if (d_triangles[p].is_over(points[i])) {
 					d_triangles[p].visible = true;
+					d_triangles[p].visible__++;
 				}
 			}
 		}
@@ -128,6 +129,7 @@ class HatchListener {
 			for (let p=0; p<d_triangles.length; p++) {
 				if (d_triangles[p].is_over(points[i])) {
 					d_triangles[p].visible = false;
+					d_triangles[p].visible__--;
 				}
 			}
 		}
@@ -173,6 +175,7 @@ class Triangle {
 		this.hatch();
 
 		this.visible = false;
+		this.visible__ = 0;
 	}
 
 	// http://jsfiddle.net/PerroAZUL/zdaY8/1/
@@ -226,7 +229,8 @@ class Triangle {
 			point(this.x3, this.y3);
 		}
 
-		if (!this.visible) return;
+		// if (!this.visible) return;
+		if (this.visible__ < 1) return;
 
 		if (false) {
 			// fill background with white

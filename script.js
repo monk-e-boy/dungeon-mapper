@@ -572,7 +572,7 @@ function group_squares_in_area() {
 					tmp.push(squares[c][r].clone());
 
 					// TODO: clean this shit up
-					squares[c][r].enabled = false;
+					squares[c][r].disable();
 					squares[c][r].listener.disable_hatches(squares[c][r].hatch_list);	
 				}
 			}

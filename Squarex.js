@@ -42,6 +42,15 @@ class Squarex {
 		return tmp;
 	}
 
+	disable() {
+		this.enabled = false;
+		// when we disable a room we reset the walls
+		this.top = true;
+		this.right = true;
+		this.bottom = true;
+		this.left = true;
+	}
+
 	create_hatch_list() {
 
 		if (!this.enabled) {
@@ -702,14 +711,6 @@ class Group {
 			noFill();
 
 			rect( -(halfx + 10), -(halfy + 10), halfx + 10, halfy + 10);
-
-			fill(0, 255, 0);
-			rect(halfx+10, -(halfy+10), halfx, -halfy);
-
-			stroke(0, 0, 255);
-			strokeWeight(7);
-			arc(halfx, -halfy, 50, 50, -HALF_PI, 0, OPEN);
-
 
 			//
 			this.centre_button.render();
